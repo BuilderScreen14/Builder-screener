@@ -1255,6 +1255,28 @@ window._R = [];
 
 function sc(s){return s>=75?'sh':s>=50?'sm':'sl'}
 function bc(p){return p>=70?'var(--green)':p>=45?'var(--amber)':'var(--red)'}
+// ── AUTO STATUS CORRECTION ──────────────────────────────────
+// Checks completion date against today and corrects status automatically
+function liveStatus(p){
+  const s = p.status;
+  const c = p.completion || '';
+  // Never auto-complete stalled, NBCC-managed, or IBC projects
+  if(s==='Stalled' || c.includes('TBD') || c.includes('IBC') || c.includes('NBCC') || c.includes('ongoing') || c.includes('Phased')) return s;
+  // Strip parenthetical notes like "(was Dec 2023)" to get the CLAIMED completion date
+  const base = c.replace(/\s*\(.*?\)/g,'').trim();
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const parts = base.split(' ');
+  if(parts.length >= 2 && months[parts[0]] !== undefined){
+    const completionDate = new Date(parseInt(parts[1]), months[parts[0]] + 1, 0); // last day of that month
+    const today = new Date();
+    if(completionDate < today){
+      // Completion date is in the past
+      if(s === 'Delayed') return 'Delayed'; // Builder delayed — keep as delayed
+      if(s === 'On track') return 'Completed'; // Was on track and date passed = completed
+    }
+  }
+  return s;
+}
 function ps(s){return s==='Completed'?'tg':s==='On track'?'tb':s==='Delayed'?'ta':'tr'}
 function uR(id,vid){document.getElementById(vid).textContent=document.getElementById(id).value}
 function uRp(id,vid){document.getElementById(vid).textContent=document.getElementById(id).value+'%'}
@@ -1340,13 +1362,16 @@ function render(data){
 
     // Build projects table
     const projRows=b.projects.map(p=>{
-      const pCol=p.status==='Completed'?'var(--green)':p.status==='On track'?'var(--blue)':p.status==='Delayed'?'var(--amber)':'var(--red)';
+      const st=liveStatus(p); // auto-corrects based on today's date
+      const pCol=st==='Completed'?'var(--green)':st==='On track'?'var(--blue)':st==='Delayed'?'var(--amber)':'var(--red)';
+      // If auto-corrected to Completed, show pct as 100
+      const displayPct = st==='Completed' ? 100 : p.pct;
       return `<tr>
         <td><div class="proj-name">${p.name}</div><div class="proj-loc">${p.loc}</div>
-          <div class="proj-bar"><div class="proj-bar-fill" style="width:${p.pct}%;background:${pCol}"></div></div>
+          <div class="proj-bar"><div class="proj-bar-fill" style="width:${displayPct}%;background:${pCol}"></div></div>
         </td>
-        <td><span class="tag ${ps(p.status)}">${p.status}</span></td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2)">${p.pct}%</span></td>
+        <td><span class="tag ${ps(st)}">${st}</span></td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2)">${displayPct}%</span></td>
         <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2)">${p.units.toLocaleString()}</span></td>
         <td><span style="font-size:11px;color:var(--ink3)">${p.completion}</span></td>
         <td><span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--blue)">${p.rera_id}</span></td>
