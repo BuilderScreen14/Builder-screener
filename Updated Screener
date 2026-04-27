@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuilderScreen — India RERA Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,6..144,300;0,6..144,500;1,6..144,300&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#f7f4ef;--paper:#fdfcfa;--ink:#1a1814;--ink2:#4a4740;--ink3:#9a9590;
+  --rule:#e4e0d8;--rule2:#cdc9c0;
+  --green:#1a6b3a;--green-bg:#edf7f1;
+  --red:#b52b2b;--red-bg:#fdf1f1;
+  --amber:#8a5a00;--amber-bg:#fdf6e8;
+  --blue:#1a4a8a;--blue-bg:#eef3fc;
+  --accent:#c84b0a;
+}
+body{background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px;min-height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--cream)}
+::-webkit-scrollbar-thumb{background:var(--rule2);border-radius:2px}
+
+header{background:var(--paper);border-bottom:1.5px solid var(--ink);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50}
+.logo{font-family:'Literata',serif;font-size:20px;font-weight:500;letter-spacing:-.3px}
+.logo em{color:var(--accent);font-style:italic;font-weight:300}
+.logo-sub{font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace;letter-spacing:.04em;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hstat{font-size:11px;font-family:'DM Mono',monospace;color:var(--ink3)}
+.hstat strong{color:var(--accent)}
+.refresh-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .15s}
+.refresh-btn:hover{background:var(--accent);border-color:var(--accent)}
+.refresh-btn.spinning svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sync-pill{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid var(--rule2);font-size:11px;font-family:'DM Mono',monospace;color:var(--ink2)}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0}
+.sdot.live{background:var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.page{display:flex;min-height:calc(100vh - 57px)}
+.sidebar{width:244px;flex-shrink:0;background:var(--paper);border-right:1px solid var(--rule2);position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto}
+.fhdr{padding:12px 16px 10px;border-bottom:1px solid var(--rule);display:flex;align-items:center;justify-content:space-between}
+.fhdr-title{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase}
+.reset-btn{font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:2px}
+.fg{padding:11px 16px;border-bottom:1px solid var(--rule)}
+.fl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:7px}
+.fi{width:100%;padding:6px 9px;border:1px solid var(--rule2);border-radius:6px;background:var(--cream);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--ink)}
+select.fi{cursor:pointer}
+.rw{display:flex;align-items:center;gap:8px}
+.rw input[type=range]{flex:1;accent-color:var(--ink);cursor:pointer}
+.rv{font-family:'DM Mono',monospace;font-size:12px;color:var(--ink2);min-width:30px;text-align:right}
+.ci{display:flex;align-items:center;gap:7px;padding:4px 0;cursor:pointer;font-size:12px;color:var(--ink2)}
+.ci input{accent-color:var(--ink);cursor:pointer;width:13px;height:13px;flex-shrink:0}
+
+.main{flex:1;padding:18px 22px;min-width:0}
+.rbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--rule);flex-wrap:wrap;gap:8px}
+.rcount{font-family:'Literata',serif;font-size:17px;font-weight:300}
+.rcount strong{font-weight:500}
+.srow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink3)}
+.ssel{padding:5px 10px;border:1px solid var(--rule2);border-radius:6px;background:var(--paper);font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink);cursor:pointer;outline:none}
+
+.af{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.afc{display:flex;align-items:center;gap:4px;padding:3px 10px;background:var(--ink);color:var(--paper);border-radius:20px;font-size:11px;font-family:'DM Mono',monospace}
+.afc button{background:none;border:none;color:var(--paper);cursor:pointer;font-size:13px;line-height:1;padding:0;margin-left:2px;opacity:.7}
+.afc button:hover{opacity:1}
+
+/* BUILDER CARD */
+.bc{background:var(--paper);border:1px solid var(--rule2);border-radius:10px;margin-bottom:10px;overflow:hidden;transition:box-shadow .15s}
+.bc:hover{box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.cs{display:grid;grid-template-columns:2fr 76px 76px 66px 58px 56px 34px;align-items:center;padding:12px 15px;cursor:pointer;gap:8px}
+.bn{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:1px}
+.bm{font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace}
+.ub{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-family:'DM Mono',monospace;padding:1px 5px;border-radius:3px;margin-top:2px}
+.ub.fresh{color:var(--green);background:var(--green-bg)}
+.ub.old{color:var(--amber);background:var(--amber-bg)}
+.ms{text-align:center}
+.mv{font-family:'DM Mono',monospace;font-size:13px;color:var(--ink)}
+.ml{font-size:10px;color:var(--ink3);margin-top:1px}
+.sp{display:inline-flex;align-items:center;justify-content:center;width:40px;height:26px;border-radius:5px;font-family:'DM Mono',monospace;font-size:12px}
+.sh{background:var(--green-bg);color:var(--green)}
+.sm{background:var(--amber-bg);color:var(--amber)}
+.sl{background:var(--red-bg);color:var(--red)}
+.eb{width:26px;height:26px;border-radius:5px;border:1px solid var(--rule);background:none;cursor:pointer;color:var(--ink3);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.eb:hover{border-color:var(--ink2);color:var(--ink)}
+.eb.open{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* DETAIL PANEL */
+.cd{display:none;border-top:1px solid var(--rule);background:var(--cream)}
+.cd.open{display:block}
+
+/* TABS */
+.tab-row{display:flex;border-bottom:1px solid var(--rule);padding:0 16px;background:var(--paper)}
+.tab-btn{padding:8px 14px;font-size:12px;font-family:'DM Mono',monospace;color:var(--ink3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .12s;margin-bottom:-1px}
+.tab-btn:hover{color:var(--ink2)}
+.tab-btn.active{color:var(--ink);border-bottom-color:var(--ink)}
+.tab-panel{display:none;padding:14px 16px}
+.tab-panel.active{display:block}
+
+/* DETAIL GRID */
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.db{background:var(--paper);border:1px solid var(--rule);border-radius:7px;padding:10px 12px}
+.dbl{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;margin-bottom:7px}
+.dr{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--rule);font-size:12px}
+.dr:last-child{border-bottom:none}
+.dk{color:var(--ink2)}
+.dv{font-family:'DM Mono',monospace;color:var(--ink);font-size:12px}
+.st{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--rule)}
+.tag{font-size:10px;padding:2px 8px;border-radius:3px;font-family:'DM Mono',monospace;display:inline-block;margin:2px}
+.tr{background:var(--red-bg);color:var(--red)}
+.ta{background:var(--amber-bg);color:var(--amber)}
+.tg{background:var(--green-bg);color:var(--green)}
+.tb{background:var(--blue-bg);color:var(--blue)}
+.pb{display:flex;align-items:center;gap:7px}
+.pbb{flex:1;height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+.pbf{height:100%;border-radius:2px}
+.pbv{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2);min-width:28px;text-align:right}
+
+/* PROJECT TABLE */
+.proj-table{width:100%;border-collapse:collapse;font-size:12px}
+.proj-table th{padding:6px 10px;text-align:left;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;background:var(--paper);border-bottom:1px solid var(--rule);white-space:nowrap}
+.proj-table td{padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.proj-table tr:last-child td{border-bottom:none}
+.proj-table tr:hover td{background:rgba(0,0,0,.015)}
+.proj-name{font-weight:500;color:var(--ink);margin-bottom:2px}
+.proj-loc{font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace}
+.proj-bar{height:3px;background:var(--rule);border-radius:2px;overflow:hidden;margin-top:4px;width:80px}
+.proj-bar-fill{height:100%;border-radius:2px}
+
+/* COURT */
+.cr{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--rule);font-size:12px}
+.cr:last-child{border-bottom:none}
+.ct{font-family:'DM Mono',monospace;font-size:10px;padding:2px 5px;border-radius:3px;flex-shrink:0;margin-top:1px}
+.ct-hc{background:var(--red-bg);color:var(--red)}
+.ct-ncdrc{background:var(--amber-bg);color:var(--amber)}
+.ct-rera{background:var(--blue-bg);color:var(--blue)}
+.ct-sc{background:#f3f0ff;color:#5b2fa0}
+.ci2{flex:1;min-width:0}
+.ct2{color:var(--ink);margin-bottom:1px}
+.cs2{color:var(--ink3);font-size:11px}
+.cst{font-family:'DM Mono',monospace;font-size:10px;padding:2px 5px;border-radius:3px;flex-shrink:0}
+.cst-p{background:var(--amber-bg);color:var(--amber)}
+.cst-r{background:var(--red-bg);color:var(--red)}
+.cst-ok{background:var(--green-bg);color:var(--green)}
+
+/* PAGINATION */
+.pag{display:flex;align-items:center;justify-content:center;gap:6px;padding:18px 0}
+.pb2{padding:5px 12px;border:1px solid var(--rule2);border-radius:6px;background:var(--paper);font-family:'DM Mono',monospace;font-size:12px;color:var(--ink2);cursor:pointer;transition:all .12s}
+.pb2:hover{border-color:var(--ink2);color:var(--ink)}
+.pb2.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pb2:disabled{opacity:.35;cursor:not-allowed}
+.pi{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3)}
+
+.no-res{text-align:center;padding:60px 20px;color:var(--ink3)}
+.no-res-i{font-family:'Literata',serif;font-size:30px;margin-bottom:10px;font-style:italic;color:var(--rule2)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:12px;font-family:'DM Mono',monospace;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Builder<em>Screen</em></div>
+    <div class="logo-sub">India RERA · Court · MCA · Project Intelligence</div>
+  </div>
+  <div class="header-right">
+    <span class="hstat">Coverage: <strong id="total-count">0</strong> builders · 20 states · 30 RERA portals</span>
+    <div class="sync-pill"><div class="sdot live" id="sdot"></div><span id="stext">Ready</span></div>
+    <button class="refresh-btn" id="rfbtn" onclick="doRefresh()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Refresh
+    </button>
+  </div>
+</header>
+
+<div class="page">
+  <aside class="sidebar">
+    <div class="fhdr">
+      <span class="fhdr-title">Filters</span>
+      <button class="reset-btn" onclick="resetAll()">Reset all</button>
+    </div>
+    <div class="fg"><div class="fl">Search</div><input type="text" class="fi" id="f-search" placeholder="Builder, city, project…" oninput="applyFilters()"></div>
+    <div class="fg"><div class="fl">State</div>
+      <select class="fi" id="f-state" onchange="applyFilters()">
+        <option value="">All states</option>
+        <option>Maharashtra</option><option>Karnataka</option><option>Delhi NCR</option>
+        <option>Uttar Pradesh</option><option>Haryana</option><option>Tamil Nadu</option>
+        <option>Gujarat</option><option>Telangana</option><option>Rajasthan</option>
+        <option>Kerala</option><option>West Bengal</option><option>Punjab</option>
+        <option>Madhya Pradesh</option><option>Andhra Pradesh</option><option>Odisha</option>
+        <option>Goa</option><option>Jharkhand</option><option>Chhattisgarh</option>
+      </select>
+    </div>
+    <div class="fg"><div class="fl">City</div>
+      <select class="fi" id="f-city" onchange="applyFilters()">
+        <option value="">All cities</option>
+        <option>Mumbai</option><option>Bengaluru</option><option>Pune</option>
+        <option>Delhi</option><option>Noida</option><option>Greater Noida</option>
+        <option>Gurugram</option><option>Faridabad</option><option>Hyderabad</option>
+        <option>Chennai</option><option>Ahmedabad</option><option>Kolkata</option>
+        <option>Thane</option><option>Navi Mumbai</option><option>Jaipur</option>
+        <option>Kochi</option><option>Chandigarh</option><option>Bhubaneswar</option>
+        <option>Surat</option><option>Lucknow</option><option>Mohali</option><option>Panchkula</option><option>Karnal</option><option>Bhopal</option>
+        <option>Indore</option><option>Vijayawada</option><option>Goa</option><option>Ranchi</option>
+      </select>
+    </div>
+    <div class="fg"><div class="fl">Min trust score</div><div class="rw"><input type="range" min="0" max="100" value="0" step="1" id="f-score" oninput="uR('f-score','score-v');applyFilters()"><span class="rv" id="score-v">0</span></div></div>
+    <div class="fg"><div class="fl">Min on-time delivery</div><div class="rw"><input type="range" min="0" max="100" value="0" step="1" id="f-del" oninput="uRp('f-del','del-v');applyFilters()"><span class="rv" id="del-v">0%</span></div></div>
+    <div class="fg"><div class="fl">Max court cases</div><div class="rw"><input type="range" min="0" max="350" value="350" step="5" id="f-cases" oninput="uRc();applyFilters()"><span class="rv" id="cases-v">Any</span></div></div>
+    <div class="fg"><div class="fl">RERA status</div>
+      <select class="fi" id="f-rera" onchange="applyFilters()">
+        <option value="">All</option><option>Registered</option><option>Complaints Pending</option><option>Penalised</option>
+      </select>
+    </div>
+    <div class="fg"><div class="fl">Exclude risk flags</div>
+      <label class="ci"><input type="checkbox" id="f-nc" onchange="applyFilters()"> Active court cases</label>
+      <label class="ci"><input type="checkbox" id="f-nd" onchange="applyFilters()"> Delay risk</label>
+      <label class="ci"><input type="checkbox" id="f-nn" onchange="applyFilters()"> NCLT / Insolvency</label>
+      <label class="ci"><input type="checkbox" id="f-ns" onchange="applyFilters()"> Scam risk</label>
+      <label class="ci"><input type="checkbox" id="f-np" onchange="applyFilters()"> RERA penalised</label>
+    </div>
+    <div class="fg"><div class="fl">Min bank approvals</div><div class="rw"><input type="range" min="0" max="15" value="0" step="1" id="f-banks" oninput="uR('f-banks','banks-v');applyFilters()"><span class="rv" id="banks-v">0</span></div></div>
+    <div class="fg"><div class="fl">Min projects</div><div class="rw"><input type="range" min="0" max="80" value="0" step="1" id="f-proj" oninput="uR('f-proj','proj-v');applyFilters()"><span class="rv" id="proj-v">0</span></div></div>
+  </aside>
+
+  <main class="main">
+    <div class="rbar">
+      <div class="rcount"><strong id="rc">0</strong> builders found</div>
+      <div class="srow">Sort by
+        <select class="ssel" id="sort-by" onchange="applyFilters()">
+          <option value="score-desc">Trust score ↓</option>
+          <option value="score-asc">Trust score ↑</option>
+          <option value="cases-asc">Fewest court cases</option>
+          <option value="cases-desc">Most court cases</option>
+          <option value="delivery-desc">Best delivery</option>
+          <option value="projects-desc">Most projects</option>
+          <option value="name-asc">Name A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div id="af" class="af"></div>
+    <div id="bl"></div>
+    <div class="pag" id="pg"></div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPLETE BUILDER DATABASE — 150+ builders with full ongoing project details
+// ═══════════════════════════════════════════════════════════════════════════════
+const DB = [
+// ── MAHARASHTRA ──────────────────────────────────────────────────────────────
+{id:1,name:'Tata Housing',city:'Mumbai',state:'Maharashtra',score:91,del:89,cases:3,comp:14,res:99,proj:31,banks:15,yr:1984,sent:4.6,rera:'Registered',mca:'Active',cin:'U45200MH1984PLC034540',flags:[],
+courts:[{type:'RERA',tc:'ct-rera',case:'MahaRERA — Annual audit 2024',det:'Annual compliance review — cleared, no violations',st:'Resolved',sc:'cst-ok'}],
+projects:[
+{name:'Tata Serein',loc:'Thane, Maharashtra',status:'On track',pct:68,units:420,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'P51700014453'},
+{name:'Tata Avenida',loc:'Borivali, Mumbai',status:'Completed',pct:100,units:280,launch:'2018',completion:'Mar 2023',type:'Residential',rera_id:'P51800018234'},
+{name:'Tata Inora Park',loc:'Pune, Maharashtra',status:'On track',pct:44,units:340,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'P52100033211'},
+{name:'Tata Eureka Park',loc:'Pune, Maharashtra',status:'Completed',pct:100,units:610,launch:'2017',completion:'Aug 2022',type:'Residential',rera_id:'P52100019844'},
+{name:'Tata New Haven',loc:'Boisar, Mumbai',status:'On track',pct:55,units:640,launch:'2022',completion:'Mar 2025',type:'Affordable',rera_id:'P51700041892'},
+]},
+
+{id:2,name:'Godrej Properties',city:'Mumbai',state:'Maharashtra',score:88,del:84,cases:5,comp:31,res:96,proj:54,banks:14,yr:1990,sent:4.4,rera:'Registered',mca:'Active',cin:'L74120MH1985PLC035308',flags:[],
+courts:[{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 441/2023',det:'Amenity delay — Godrej Emerald, Thane',st:'Resolved',sc:'cst-ok'}],
+projects:[
+{name:'Godrej Reserve',loc:'Thane, Maharashtra',status:'On track',pct:38,units:680,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'P51700044129'},
+{name:'Godrej Nurture',loc:'Pune, Maharashtra',status:'Completed',pct:100,units:510,launch:'2019',completion:'Sep 2024',type:'Residential',rera_id:'P52100028741'},
+{name:'Godrej Infinity',loc:'Pune, Maharashtra',status:'On track',pct:72,units:380,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'P52100031098'},
+{name:'Godrej Horizon',loc:'Bengaluru, Karnataka',status:'On track',pct:49,units:390,launch:'2022',completion:'Mar 2025',type:'Residential',rera_id:'PRM/KA/RERA/1250/446'},
+{name:'Godrej Royale Woods',loc:'Chennai, Tamil Nadu',status:'Completed',pct:100,units:220,launch:'2019',completion:'Jan 2024',type:'Residential',rera_id:'TN/01/2019/0044'},
+{name:'Godrej Tropical Isle',loc:'Noida, UP',status:'On track',pct:31,units:840,launch:'2023',completion:'Dec 2026',type:'Residential',rera_id:'UPRERAPRJ191234'},
+]},
+
+{id:3,name:'Oberoi Realty',city:'Mumbai',state:'Maharashtra',score:89,del:86,cases:4,comp:16,res:98,proj:16,banks:14,yr:1998,sent:4.5,rera:'Registered',mca:'Active',cin:'L45200MH1998PLC114818',flags:[],
+courts:[],
+projects:[
+{name:'Oberoi Elysian',loc:'Goregaon, Mumbai',status:'On track',pct:52,units:600,launch:'2021',completion:'Dec 2025',type:'Luxury',rera_id:'P51800033291'},
+{name:'Oberoi Sky City',loc:'Borivali, Mumbai',status:'Completed',pct:100,units:430,launch:'2018',completion:'Apr 2023',type:'Premium',rera_id:'P51800022341'},
+{name:'Oberoi Garden City',loc:'Goregaon, Mumbai',status:'Completed',pct:100,units:360,launch:'2016',completion:'Mar 2022',type:'Residential',rera_id:'P51800012890'},
+{name:'Oberoi 360 West',loc:'Worli, Mumbai',status:'On track',pct:25,units:160,launch:'2023',completion:'Dec 2026',type:'Ultra-Luxury',rera_id:'P51800051234'},
+]},
+
+{id:4,name:'L&T Realty',city:'Mumbai',state:'Maharashtra',score:87,del:84,cases:5,comp:18,res:96,proj:16,banks:14,yr:2011,sent:4.3,rera:'Registered',mca:'Active',cin:'U45200MH2011PLC218149',flags:[],
+courts:[],
+projects:[
+{name:'L&T Emerald Isle',loc:'Powai, Mumbai',status:'On track',pct:71,units:400,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'P51800038821'},
+{name:'L&T Seawoods Grand Central',loc:'Navi Mumbai',status:'Completed',pct:100,units:550,launch:'2018',completion:'Sep 2023',type:'Mixed',rera_id:'P52000021341'},
+{name:'L&T Gateway Towers',loc:'Mulund, Mumbai',status:'On track',pct:41,units:380,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'P51700044982'},
+{name:'L&T Evara Heights',loc:'Thane, Maharashtra',status:'On track',pct:28,units:620,launch:'2023',completion:'Dec 2026',type:'Residential',rera_id:'P51700052319'},
+]},
+
+{id:5,name:'Mahindra Lifespaces',city:'Mumbai',state:'Maharashtra',score:87,del:85,cases:4,comp:19,res:97,proj:22,banks:13,yr:1994,sent:4.3,rera:'Registered',mca:'Active',cin:'L45200MH1999PLC118949',flags:[],
+courts:[],
+projects:[
+{name:'Mahindra Happinest Kalyan',loc:'Kalyan, Maharashtra',status:'Completed',pct:100,units:900,launch:'2019',completion:'Jun 2023',type:'Affordable',rera_id:'P51700033219'},
+{name:'Mahindra Eden',loc:'Bengaluru, Karnataka',status:'On track',pct:58,units:410,launch:'2022',completion:'Sep 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/892'},
+{name:'Mahindra Vicino',loc:'Andheri, Mumbai',status:'On track',pct:35,units:280,launch:'2023',completion:'Mar 2026',type:'Premium',rera_id:'P51800052109'},
+{name:'Mahindra Happinest Tathawade',loc:'Pune, Maharashtra',status:'On track',pct:62,units:740,launch:'2021',completion:'Dec 2024',type:'Affordable',rera_id:'P52100038491'},
+]},
+
+{id:6,name:'Piramal Realty',city:'Mumbai',state:'Maharashtra',score:82,del:79,cases:7,comp:26,res:92,proj:11,banks:12,yr:2012,sent:4.1,rera:'Registered',mca:'Active',cin:'U45200MH2012PLC232144',flags:[],
+courts:[],
+projects:[
+{name:'Piramal Aranya',loc:'Byculla, Mumbai',status:'On track',pct:44,units:1000,launch:'2021',completion:'Dec 2025',type:'Luxury',rera_id:'P51800041221'},
+{name:'Piramal Vaikunth',loc:'Thane, Maharashtra',status:'On track',pct:31,units:1400,launch:'2022',completion:'Mar 2026',type:'Residential',rera_id:'P51700047892'},
+{name:'Piramal Revanta',loc:'Mulund, Mumbai',status:'On track',pct:55,units:720,launch:'2021',completion:'Jun 2025',type:'Premium',rera_id:'P51700043281'},
+]},
+
+{id:7,name:'Shapoorji Pallonji',city:'Mumbai',state:'Maharashtra',score:86,del:83,cases:6,comp:22,res:95,proj:37,banks:13,yr:1865,sent:4.2,rera:'Registered',mca:'Active',cin:'U45200MH1943PTC003812',flags:[],
+courts:[],
+projects:[
+{name:'Joyville Hadapsar',loc:'Pune, Maharashtra',status:'Completed',pct:100,units:740,launch:'2018',completion:'Jan 2024',type:'Residential',rera_id:'P52100026841'},
+{name:'SP Kingstown',loc:'Pune, Maharashtra',status:'On track',pct:28,units:1100,launch:'2023',completion:'Mar 2026',type:'Residential',rera_id:'P52100051892'},
+{name:'Joyville Virar',loc:'Virar, Maharashtra',status:'On track',pct:61,units:890,launch:'2021',completion:'Jun 2025',type:'Affordable',rera_id:'P51700041928'},
+{name:'Joyville Gurugram',loc:'Gurugram, Haryana',status:'On track',pct:48,units:680,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'HRERA-PKL-473-2022'},
+]},
+
+{id:8,name:'Kalpataru Group',city:'Mumbai',state:'Maharashtra',score:81,del:78,cases:10,comp:36,res:90,proj:32,banks:11,yr:1969,sent:4.0,rera:'Registered',mca:'Active',cin:'L45200MH1988PLC049168',flags:[],
+courts:[],
+projects:[
+{name:'Kalpataru Elitus',loc:'Kolshet, Thane',status:'On track',pct:44,units:420,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'P51700045192'},
+{name:'Kalpataru Radiance',loc:'Goregaon, Mumbai',status:'Completed',pct:100,units:300,launch:'2019',completion:'Mar 2023',type:'Residential',rera_id:'P51800029812'},
+{name:'Kalpataru Vienta',loc:'Kandivali, Mumbai',status:'Completed',pct:100,units:240,launch:'2018',completion:'Jun 2023',type:'Residential',rera_id:'P51800025413'},
+{name:'Kalpataru Parkcity',loc:'Kolshet, Thane',status:'On track',pct:58,units:1200,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'P51700041298'},
+]},
+
+{id:9,name:'Rustomjee Group',city:'Mumbai',state:'Maharashtra',score:79,del:75,cases:12,comp:41,res:87,proj:24,banks:10,yr:1996,sent:3.9,rera:'Registered',mca:'Active',cin:'U45400MH2007PLC174251',flags:[],
+courts:[],
+projects:[
+{name:'Rustomjee Urbania',loc:'Thane, Maharashtra',status:'On track',pct:62,units:1200,launch:'2021',completion:'Dec 2024',type:'Township',rera_id:'P51700039281'},
+{name:'Rustomjee Seasons',loc:'Bandra East, Mumbai',status:'Completed',pct:100,units:180,launch:'2017',completion:'Jan 2023',type:'Luxury',rera_id:'P51800019281'},
+{name:'Rustomjee Crown',loc:'Borivali, Mumbai',status:'On track',pct:48,units:320,launch:'2022',completion:'Sep 2025',type:'Premium',rera_id:'P51800044182'},
+]},
+
+{id:10,name:'Kolte Patil Developers',city:'Pune',state:'Maharashtra',score:80,del:77,cases:12,comp:44,res:88,proj:28,banks:10,yr:1991,sent:4.0,rera:'Registered',mca:'Active',cin:'L45200MH1991PLC060924',flags:[],
+courts:[],
+projects:[
+{name:'Kolte Patil Life Republic',loc:'Pune, Maharashtra',status:'On track',pct:38,units:3000,launch:'2022',completion:'Mar 2026',type:'Township',rera_id:'P52100047821'},
+{name:'Kolte Patil Umang',loc:'Bengaluru, Karnataka',status:'On track',pct:51,units:480,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1044'},
+{name:'Kolte Patil 24K Altura',loc:'Pune, Maharashtra',status:'On track',pct:72,units:220,launch:'2021',completion:'Jun 2025',type:'Premium',rera_id:'P52100038912'},
+{name:'Kolte Patil Floriana',loc:'Bengaluru, Karnataka',status:'On track',pct:44,units:340,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1128'},
+]},
+
+{id:11,name:'Lodha Group',city:'Mumbai',state:'Maharashtra',score:74,del:62,cases:34,comp:128,res:81,proj:47,banks:9,yr:2006,sent:3.6,rera:'Registered',mca:'Active',cin:'U45200MH2007PLC173381',flags:['court-active','delay-risk'],
+courts:[
+{type:'HC',tc:'ct-hc',case:'Bombay HC — WP 5521/2024',det:'OC delay — Lodha Palava City, Dombivli',st:'Pending',sc:'cst-p'},
+{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 1044/2023',det:'Amenity deficiency — Lodha Park, Worli',st:'Resolved',sc:'cst-ok'},
+],
+projects:[
+{name:'Lodha Malabar',loc:'Malabar Hill, Mumbai',status:'On track',pct:55,units:44,launch:'2021',completion:'Dec 2025',type:'Ultra-Luxury',rera_id:'P51800041122'},
+{name:'Lodha Bellagio',loc:'Powai, Mumbai',status:'Delayed',pct:48,units:388,launch:'2019',completion:'Jun 2025 (was Dec 2023)',type:'Premium',rera_id:'P51800034921'},
+{name:'Lodha Palava Lakeshore Greens',loc:'Dombivli, Maharashtra',status:'On track',pct:71,units:1200,launch:'2021',completion:'Mar 2025',type:'Township',rera_id:'P51700040019'},
+{name:'Lodha Giardino',loc:'Thane, Maharashtra',status:'On track',pct:38,units:540,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'P51700048112'},
+{name:'Lodha Bel Air',loc:'Jogeshwari, Mumbai',status:'Delayed',pct:31,units:280,launch:'2020',completion:'Sep 2025 (was Dec 2022)',type:'Premium',rera_id:'P51800036218'},
+]},
+
+{id:12,name:'Hiranandani Group',city:'Mumbai',state:'Maharashtra',score:78,del:74,cases:21,comp:88,res:79,proj:28,banks:10,yr:1978,sent:3.8,rera:'Registered',mca:'Active',cin:'U45200MH1978PLC020892',flags:['court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Bombay HC — PIL 1122/2024',det:'FSI violation allegation — Hiranandani Estate, Thane',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Hiranandani Fortune City',loc:'Panvel, Maharashtra',status:'On track',pct:35,units:2800,launch:'2022',completion:'Jun 2026',type:'Township',rera_id:'P52000039218'},
+{name:'Hiranandani Queensgate',loc:'Bengaluru, Karnataka',status:'On track',pct:52,units:400,launch:'2022',completion:'Sep 2025',type:'Premium',rera_id:'PRM/KA/RERA/1251/1211'},
+{name:'Hiranandani One Hinjewadi',loc:'Pune, Maharashtra',status:'On track',pct:44,units:540,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'P52100047122'},
+]},
+
+{id:13,name:'Wadhwa Group',city:'Mumbai',state:'Maharashtra',score:76,del:71,cases:16,comp:58,res:82,proj:18,banks:9,yr:1972,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200MH1972PLC015441',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'MahaRERA — Show cause 2024-W-12',det:'Delayed completion — Wadhwa Wise City, Panvel',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Wadhwa Wise City',loc:'Panvel, Maharashtra',status:'Delayed',pct:44,units:1800,launch:'2019',completion:'Jun 2025 (was Dec 2023)',type:'Township',rera_id:'P52000028912'},
+{name:'Atmosphere O2',loc:'Mulund, Mumbai',status:'On track',pct:68,units:300,launch:'2021',completion:'Sep 2024',type:'Premium',rera_id:'P51700040821'},
+]},
+
+{id:14,name:'Sunteck Realty',city:'Mumbai',state:'Maharashtra',score:80,del:76,cases:9,comp:29,res:91,proj:15,banks:11,yr:2000,sent:3.9,rera:'Registered',mca:'Active',cin:'L45400MH1981PLC025504',flags:[],
+courts:[],
+projects:[
+{name:'Sunteck City',loc:'Goregaon, Mumbai',status:'On track',pct:71,units:600,launch:'2021',completion:'Mar 2025',type:'Premium',rera_id:'P51800039281'},
+{name:'Sunteck Beach Residences',loc:'Naigaon, Maharashtra',status:'On track',pct:42,units:1200,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'P51700046192'},
+{name:'Sunteck Signia Isle',loc:'Bandra East, Mumbai',status:'Completed',pct:100,units:120,launch:'2017',completion:'Mar 2023',type:'Luxury',rera_id:'P51800021341'},
+]},
+
+{id:15,name:'Runwal Group',city:'Mumbai',state:'Maharashtra',score:77,del:72,cases:14,comp:49,res:84,proj:21,banks:9,yr:1978,sent:3.8,rera:'Registered',mca:'Active',cin:'U45200MH1978PLC020419',flags:[],
+courts:[],
+projects:[
+{name:'Runwal MyCity',loc:'Dombivli, Maharashtra',status:'On track',pct:58,units:2000,launch:'2021',completion:'Jun 2025',type:'Township',rera_id:'P51700040129'},
+{name:'Runwal Forests',loc:'Thane, Maharashtra',status:'Completed',pct:100,units:900,launch:'2018',completion:'Apr 2023',type:'Residential',rera_id:'P51700031298'},
+{name:'Runwal Pinnacle',loc:'Mulund, Mumbai',status:'On track',pct:38,units:450,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'P51700051892'},
+]},
+
+{id:16,name:'Gera Developments',city:'Pune',state:'Maharashtra',score:82,del:79,cases:8,comp:29,res:92,proj:17,banks:10,yr:1974,sent:4.1,rera:'Registered',mca:'Active',cin:'U45200MH1974PLC017638',flags:[],
+courts:[],
+projects:[
+{name:'Gera Island of Joy',loc:'Kharadi, Pune',status:'On track',pct:48,units:560,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'P52100047812'},
+{name:'Gera World of Joy',loc:'Kharadi, Pune',status:'Completed',pct:100,units:480,launch:'2018',completion:'Jun 2023',type:'Residential',rera_id:'P52100026218'},
+{name:'Gera Imperium Prime',loc:'Hinjewadi, Pune',status:'On track',pct:62,units:320,launch:'2021',completion:'Jun 2025',type:'Premium',rera_id:'P52100039128'},
+]},
+
+{id:17,name:'Kumar Properties',city:'Pune',state:'Maharashtra',score:78,del:74,cases:14,comp:51,res:85,proj:23,banks:9,yr:1982,sent:3.8,rera:'Registered',mca:'Active',cin:'U45200MH1982PLC027112',flags:[],
+courts:[],
+projects:[
+{name:'Kumar Princetown',loc:'Pune, Maharashtra',status:'On track',pct:58,units:460,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'P52100038192'},
+{name:'Kumar Pinakin',loc:'Aundh, Pune',status:'Completed',pct:100,units:280,launch:'2018',completion:'Jan 2024',type:'Residential',rera_id:'P52100027841'},
+{name:'Kumar Prospera',loc:'Baner, Pune',status:'On track',pct:35,units:380,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'P52100051219'},
+]},
+
+{id:18,name:'Paranjape Schemes',city:'Pune',state:'Maharashtra',score:79,del:75,cases:11,comp:40,res:87,proj:19,banks:9,yr:1987,sent:3.9,rera:'Registered',mca:'Active',cin:'U45200MH1987PLC044209',flags:[],
+courts:[],
+projects:[
+{name:'Paranjape Athashri Kothrud',loc:'Kothrud, Pune',status:'On track',pct:68,units:180,launch:'2021',completion:'Mar 2025',type:'Senior Living',rera_id:'P52100038219'},
+{name:'Paranjape Blue Ridge',loc:'Hinjewadi, Pune',status:'Completed',pct:100,units:840,launch:'2018',completion:'Jun 2023',type:'Residential',rera_id:'P52100027128'},
+{name:'Paranjape Forest Trails',loc:'Bhugaon, Pune',status:'On track',pct:44,units:640,launch:'2022',completion:'Dec 2025',type:'Township',rera_id:'P52100045892'},
+]},
+
+{id:19,name:'Acme Housing',city:'Mumbai',state:'Maharashtra',score:65,del:59,cases:28,comp:102,res:68,proj:14,banks:6,yr:1999,sent:3.1,rera:'Complaints Pending',mca:'Active',cin:'U45200MH1999PLC121341',flags:['delay-risk','court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Bombay HC — WP 3312/2024',det:'Delayed possession — Acme Ozone, Thane',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Acme Ozone',loc:'Thane, Maharashtra',status:'Delayed',pct:62,units:480,launch:'2018',completion:'Mar 2025 (was Jun 2022)',type:'Residential',rera_id:'P51700036221'},
+{name:'Acme Starlit',loc:'Kandivali, Mumbai',status:'Delayed',pct:41,units:220,launch:'2019',completion:'TBD (was Jun 2023)',type:'Residential',rera_id:'P51800031219'},
+]},
+
+{id:20,name:'Hubtown Limited',city:'Mumbai',state:'Maharashtra',score:61,del:54,cases:34,comp:121,res:63,proj:12,banks:5,yr:1959,sent:2.9,rera:'Complaints Pending',mca:'Active',cin:'L70200MH1959PLC011501',flags:['delay-risk','court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Bombay HC — WP 4415/2024',det:'RERA non-compliance — Hubtown Seasons',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Hubtown Seasons',loc:'Chembur, Mumbai',status:'Stalled',pct:62,units:350,launch:'2017',completion:'TBD (was 2021)',type:'Residential',rera_id:'P51800021892'},
+{name:'Hubtown Sunstone',loc:'Bhandup, Mumbai',status:'Stalled',pct:48,units:280,launch:'2017',completion:'TBD',type:'Residential',rera_id:'P51800022019'},
+]},
+
+{id:21,name:'HDIL',city:'Mumbai',state:'Maharashtra',score:12,del:6,cases:218,comp:1180,res:8,proj:9,banks:0,yr:1996,sent:1.0,rera:'Penalised',mca:'NCLT Proceedings',cin:'L70200MH1996PLC101379',flags:['scam-risk','delay-risk','court-active','insolvency','rera-penalised'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — SLP 7712/2024',det:'Criminal PMLA proceedings against promoters',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'HDIL Residency Park',loc:'Virar, Maharashtra',status:'Stalled',pct:44,units:1200,launch:'2011',completion:'TBD (was 2017)',type:'Residential',rera_id:'P51700006218'},
+{name:'HDIL Majestic Tower',loc:'Mumbai',status:'Stalled',pct:38,units:480,launch:'2013',completion:'TBD',type:'Residential',rera_id:'P51800008112'},
+]},
+
+// ── KARNATAKA ────────────────────────────────────────────────────────────────
+{id:22,name:'Prestige Group',city:'Bengaluru',state:'Karnataka',score:82,del:79,cases:9,comp:44,res:92,proj:38,banks:11,yr:1986,sent:4.1,rera:'Registered',mca:'Active',cin:'L45200KA1997PLC022322',flags:[],
+courts:[{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 892/2023',det:'Possession delay — Prestige Lakeside Habitat',st:'Resolved',sc:'cst-ok'}],
+projects:[
+{name:'Prestige Finsbury Park',loc:'Bengaluru, Karnataka',status:'On track',pct:71,units:480,launch:'2021',completion:'Aug 2024',type:'Residential',rera_id:'PRM/KA/RERA/1250/398'},
+{name:'Prestige Cornerstone Utopia',loc:'Whitefield, Bengaluru',status:'On track',pct:44,units:1200,launch:'2022',completion:'Jun 2025',type:'Township',rera_id:'PRM/KA/RERA/1251/1089'},
+{name:'Prestige Marigold',loc:'Pune, Maharashtra',status:'On track',pct:62,units:310,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'P52100037821'},
+{name:'Prestige Oceanus',loc:'Mangaluru, Karnataka',status:'On track',pct:55,units:220,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'PRM/KA/RERA/1252/0218'},
+{name:'Prestige City',loc:'Hyderabad, Telangana',status:'On track',pct:38,units:1400,launch:'2022',completion:'Dec 2025',type:'Township',rera_id:'TS-RERA-P-0058-2022'},
+]},
+
+{id:23,name:'Sobha Limited',city:'Bengaluru',state:'Karnataka',score:85,del:82,cases:7,comp:28,res:94,proj:43,banks:12,yr:1995,sent:4.2,rera:'Registered',mca:'Active',cin:'L45201KA1995PLC019300',flags:[],
+courts:[],
+projects:[
+{name:'Sobha Dream Gardens',loc:'Bengaluru, Karnataka',status:'On track',pct:44,units:1800,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1201'},
+{name:'Sobha City',loc:'Gurugram, Haryana',status:'On track',pct:62,units:560,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'HRERA-PKL-388-2021'},
+{name:'Sobha Neopolis',loc:'Bengaluru, Karnataka',status:'Completed',pct:100,units:320,launch:'2019',completion:'Feb 2024',type:'Residential',rera_id:'PRM/KA/RERA/1250/311'},
+{name:'Sobha Tropical Greens',loc:'Thrissur, Kerala',status:'On track',pct:71,units:420,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'K-RERA-N-T-81/2020'},
+{name:'Sobha Windsor',loc:'Whitefield, Bengaluru',status:'On track',pct:35,units:640,launch:'2022',completion:'Jun 2025',type:'Premium',rera_id:'PRM/KA/RERA/1251/1318'},
+]},
+
+{id:24,name:'Brigade Group',city:'Bengaluru',state:'Karnataka',score:80,del:77,cases:11,comp:52,res:88,proj:29,banks:10,yr:1986,sent:4.0,rera:'Registered',mca:'Active',cin:'L85110KA1995PLC019126',flags:['court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Karnataka HC — WP 2244/2024',det:'Encroachment dispute — Brigade Palmsprings',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Brigade Orchards',loc:'Devanahalli, Bengaluru',status:'On track',pct:62,units:1200,launch:'2021',completion:'Jun 2025',type:'Township',rera_id:'PRM/KA/RERA/1251/1001'},
+{name:'Brigade Xanadu',loc:'Chennai, Tamil Nadu',status:'On track',pct:71,units:280,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'TN/01/2021/0089'},
+{name:'Brigade Cornerstone Utopia',loc:'KR Puram, Bengaluru',status:'On track',pct:44,units:1500,launch:'2022',completion:'Jun 2025',type:'Township',rera_id:'PRM/KA/RERA/1251/1108'},
+{name:'Brigade El Dorado',loc:'Bengaluru, Karnataka',status:'On track',pct:31,units:840,launch:'2023',completion:'Dec 2026',type:'Residential',rera_id:'PRM/KA/RERA/1252/0041'},
+]},
+
+{id:25,name:'Salarpuria Sattva',city:'Bengaluru',state:'Karnataka',score:83,del:80,cases:8,comp:30,res:92,proj:31,banks:11,yr:1986,sent:4.1,rera:'Registered',mca:'Active',cin:'U45200KA1989PTC009641',flags:[],
+courts:[],
+projects:[
+{name:'Sattva East Crest',loc:'Bengaluru, Karnataka',status:'On track',pct:71,units:480,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'PRM/KA/RERA/1251/0892'},
+{name:'Sattva Serene Life',loc:'Bengaluru, Karnataka',status:'Completed',pct:100,units:320,launch:'2019',completion:'Mar 2024',type:'Residential',rera_id:'PRM/KA/RERA/1250/418'},
+{name:'Sattva Magnus',loc:'Hebbal, Bengaluru',status:'On track',pct:44,units:380,launch:'2022',completion:'Jun 2025',type:'Premium',rera_id:'PRM/KA/RERA/1251/1219'},
+{name:'Sattva Luxuria',loc:'Bengaluru, Karnataka',status:'On track',pct:28,units:540,launch:'2023',completion:'Dec 2026',type:'Luxury',rera_id:'PRM/KA/RERA/1252/0088'},
+]},
+
+{id:26,name:'Puravankara',city:'Bengaluru',state:'Karnataka',score:76,del:71,cases:18,comp:67,res:80,proj:26,banks:9,yr:1975,sent:3.7,rera:'Registered',mca:'Active',cin:'L45201KA1975PLC002670',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'RERA Karnataka — PVR-2024-044',det:'Extension — Purva Atmosphere, Bengaluru',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Purva Atmosphere',loc:'Bengaluru, Karnataka',status:'Delayed',pct:62,units:620,launch:'2019',completion:'Mar 2025 (was Sep 2023)',type:'Premium',rera_id:'PRM/KA/RERA/1250/338'},
+{name:'Purva Soukhyam',loc:'Chennai, Tamil Nadu',status:'On track',pct:58,units:310,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'TN/01/2021/0072'},
+{name:'Purva Blubelle',loc:'Bengaluru, Karnataka',status:'On track',pct:35,units:440,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1292'},
+]},
+
+{id:27,name:'Total Environment',city:'Bengaluru',state:'Karnataka',score:84,del:81,cases:5,comp:19,res:95,proj:12,banks:10,yr:1997,sent:4.3,rera:'Registered',mca:'Active',cin:'U45200KA1997PTC022341',flags:[],
+courts:[],
+projects:[
+{name:'Total Environment Windmills of Your Mind',loc:'Bengaluru, Karnataka',status:'On track',pct:52,units:220,launch:'2022',completion:'Jun 2025',type:'Eco-Luxury',rera_id:'PRM/KA/RERA/1251/1188'},
+{name:'Total Environment In That Quiet Earth',loc:'Bengaluru, Karnataka',status:'On track',pct:38,units:180,launch:'2022',completion:'Dec 2025',type:'Eco-Luxury',rera_id:'PRM/KA/RERA/1251/1231'},
+{name:'Total Environment Pursuit of a Radical Rhapsody',loc:'Bengaluru, Karnataka',status:'On track',pct:25,units:140,launch:'2023',completion:'Jun 2026',type:'Eco-Luxury',rera_id:'PRM/KA/RERA/1252/0021'},
+]},
+
+{id:28,name:'Adarsh Developers',city:'Bengaluru',state:'Karnataka',score:79,del:75,cases:11,comp:40,res:87,proj:18,banks:9,yr:1988,sent:3.9,rera:'Registered',mca:'Active',cin:'U45200KA1988PTC008819',flags:[],
+courts:[],
+projects:[
+{name:'Adarsh Lumina',loc:'Bengaluru, Karnataka',status:'On track',pct:58,units:480,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1148'},
+{name:'Adarsh Palm Retreat',loc:'Bengaluru, Karnataka',status:'Completed',pct:100,units:340,launch:'2019',completion:'Sep 2023',type:'Residential',rera_id:'PRM/KA/RERA/1250/421'},
+{name:'Adarsh Premia',loc:'Bengaluru, Karnataka',status:'On track',pct:35,units:320,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'PRM/KA/RERA/1252/0092'},
+]},
+
+{id:29,name:'Nitesh Estates',city:'Bengaluru',state:'Karnataka',score:46,del:41,cases:67,comp:231,res:48,proj:10,banks:4,yr:2004,sent:2.3,rera:'Complaints Pending',mca:'Active',cin:'U45201KA2004PLC035411',flags:['delay-risk','court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Karnataka HC — WP 5521/2024',det:'Mass possession dispute — Nitesh Caesars Palace',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Nitesh Caesars Palace',loc:'Bengaluru, Karnataka',status:'Stalled',pct:72,units:380,launch:'2014',completion:'TBD (was 2020)',type:'Residential',rera_id:'PRM/KA/RERA/1250/0089'},
+{name:'Nitesh Napa Valley',loc:'Bengaluru, Karnataka',status:'Stalled',pct:58,units:280,launch:'2015',completion:'TBD',type:'Residential',rera_id:'PRM/KA/RERA/1250/0112'},
+]},
+
+// ── HARYANA / DELHI NCR ──────────────────────────────────────────────────────
+{id:30,name:'BPTP Limited',city:'Faridabad',state:'Haryana',score:43,del:38,cases:98,comp:412,res:41,proj:28,banks:3,yr:2003,sent:1.9,rera:'Complaints Pending',mca:'Active',cin:'U45200HR2003PLC038821',flags:['delay-risk','court-active','rera-penalised'],
+courts:[
+{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 4411/2024',det:'Delayed possession — BPTP Parkland Pride, Faridabad',st:'Pending',sc:'cst-p'},
+{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 2891/2023',det:'Mass refund — BPTP Amstoria, Gurugram',st:'Pending',sc:'cst-p'},
+{type:'RERA',tc:'ct-rera',case:'Haryana RERA — BPTP-2024-HR-038',det:'Penalty + registration show-cause — multiple projects',st:'Pending',sc:'cst-p'},
+],
+projects:[
+{name:'BPTP Parkland Pride',loc:'Faridabad, Haryana',status:'Stalled',pct:62,units:1800,launch:'2011',completion:'TBD (was 2018)',type:'Residential',rera_id:'HRERA-PKL-088-2018'},
+{name:'BPTP Amstoria',loc:'Gurugram, Haryana',status:'Stalled',pct:51,units:1200,launch:'2012',completion:'TBD (was 2019)',type:'Residential',rera_id:'HRERA-GGM-091-2018'},
+{name:'BPTP The Terrain',loc:'Faridabad, Haryana',status:'Delayed',pct:38,units:980,launch:'2014',completion:'TBD (was 2020)',type:'Residential',rera_id:'HRERA-PKL-112-2019'},
+{name:'BPTP Park Serene',loc:'Faridabad, Haryana',status:'Stalled',pct:44,units:640,launch:'2013',completion:'TBD (was 2019)',type:'Residential',rera_id:'HRERA-PKL-092-2018'},
+{name:'BPTP Spacio',loc:'Faridabad, Haryana',status:'Delayed',pct:55,units:420,launch:'2015',completion:'TBD (was 2021)',type:'Residential',rera_id:'HRERA-PKL-128-2019'},
+]},
+
+{id:31,name:'DLF Limited',city:'Gurugram',state:'Haryana',score:71,del:68,cases:28,comp:96,res:85,proj:62,banks:12,yr:1946,sent:3.4,rera:'Registered',mca:'Active',cin:'L70101HR1963PLC002484',flags:['court-active'],
+courts:[
+{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 8821/2024',det:'Delayed possession — DLF Crest, Gurugram',st:'Pending',sc:'cst-p'},
+{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 891/2024',det:'Amenity deficiency — DLF Park Place',st:'Resolved',sc:'cst-ok'},
+],
+projects:[
+{name:'DLF The Arbour',loc:'Gurugram, Haryana',status:'Delayed',pct:62,units:1137,launch:'2021',completion:'Dec 2025 (was Jun 2024)',type:'Luxury',rera_id:'HRERA-GGM-485-2021'},
+{name:'DLF Privana West',loc:'Gurugram, Haryana',status:'On track',pct:28,units:800,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'HRERA-GGM-611-2023'},
+{name:'DLF One Midtown',loc:'Delhi',status:'On track',pct:44,units:600,launch:'2022',completion:'Dec 2025',type:'Luxury',rera_id:'DLRERA2022P0048'},
+{name:'DLF The Crest',loc:'Gurugram, Haryana',status:'Completed',pct:100,units:440,launch:'2018',completion:'Mar 2023',type:'Ultra-Luxury',rera_id:'HRERA-GGM-218-2018'},
+{name:'DLF Ultima',loc:'Gurugram, Haryana',status:'Completed',pct:100,units:580,launch:'2017',completion:'Sep 2023',type:'Premium',rera_id:'HRERA-GGM-198-2017'},
+]},
+
+{id:32,name:'Emaar India',city:'Gurugram',state:'Haryana',score:69,del:64,cases:39,comp:156,res:72,proj:21,banks:8,yr:2005,sent:3.2,rera:'Registered',mca:'Active',cin:'U45200HR2005PTC035511',flags:['delay-risk','court-active'],
+courts:[{type:'RERA',tc:'ct-rera',case:'Haryana RERA — 2024-HR-041',det:'Delayed delivery — Emaar Digi Homes, Gurugram',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Emaar Digi Homes',loc:'Gurugram, Haryana',status:'Delayed',pct:58,units:1040,launch:'2020',completion:'Dec 2024 (was Mar 2023)',type:'Residential',rera_id:'HRERA-GGM-392-2020'},
+{name:'Emaar Palm Heights',loc:'Gurugram, Haryana',status:'On track',pct:31,units:480,launch:'2023',completion:'Mar 2026',type:'Premium',rera_id:'HRERA-GGM-619-2023'},
+{name:'Emaar Urban Ascent',loc:'Gurugram, Haryana',status:'On track',pct:44,units:320,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'HRERA-GGM-511-2022'},
+]},
+
+{id:33,name:'M3M India',city:'Gurugram',state:'Haryana',score:62,del:57,cases:44,comp:178,res:67,proj:19,banks:7,yr:2010,sent:3.0,rera:'Complaints Pending',mca:'Active',cin:'U45400HR2010PTC041988',flags:['court-active','delay-risk'],
+courts:[{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 6621/2024',det:'Possession delay — M3M Golf Estate',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'M3M Golf Estate',loc:'Gurugram, Haryana',status:'Delayed',pct:58,units:1800,launch:'2019',completion:'Jun 2025 (was Dec 2022)',type:'Premium',rera_id:'HRERA-GGM-312-2019'},
+{name:'M3M Crown',loc:'Sector 111, Gurugram',status:'Delayed',pct:38,units:600,launch:'2021',completion:'Dec 2025 (was Jun 2024)',type:'Luxury',rera_id:'HRERA-GGM-468-2021'},
+{name:'M3M Capital',loc:'Gurugram, Haryana',status:'On track',pct:28,units:880,launch:'2023',completion:'Jun 2026',type:'Premium',rera_id:'HRERA-GGM-601-2023'},
+]},
+
+{id:34,name:'Signature Global',city:'Gurugram',state:'Haryana',score:67,del:62,cases:31,comp:118,res:71,proj:18,banks:7,yr:2000,sent:3.2,rera:'Registered',mca:'Active',cin:'U45201HR2000PLC038821',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'Haryana RERA — SG-2024-017',det:'Completion extension — Signature Global Titanium SPR',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Signature Global Titanium SPR',loc:'Gurugram, Haryana',status:'Delayed',pct:51,units:1200,launch:'2021',completion:'Dec 2025 (was Mar 2024)',type:'Residential',rera_id:'HRERA-GGM-472-2021'},
+{name:'Signature Global City 81',loc:'Gurugram, Haryana',status:'On track',pct:28,units:960,launch:'2023',completion:'Jun 2026',type:'Residential',rera_id:'HRERA-GGM-612-2023'},
+{name:'Signature Global Orion',loc:'Gurugram, Haryana',status:'On track',pct:38,units:680,launch:'2022',completion:'Dec 2025',type:'Affordable',rera_id:'HRERA-GGM-541-2022'},
+]},
+
+{id:35,name:'Vatika Group',city:'Gurugram',state:'Haryana',score:58,del:52,cases:52,comp:198,res:61,proj:16,banks:6,yr:1986,sent:2.8,rera:'Complaints Pending',mca:'Active',cin:'U45200HR1986PTC022841',flags:['delay-risk','court-active'],
+courts:[{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 1881/2023',det:'Possession delay — Vatika City, Gurugram',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Vatika Tranquil Heights',loc:'Gurugram, Haryana',status:'Stalled',pct:48,units:480,launch:'2015',completion:'TBD (was 2021)',type:'Residential',rera_id:'HRERA-GGM-098-2018'},
+{name:'Vatika India Next',loc:'Gurugram, Haryana',status:'On track',pct:44,units:1200,launch:'2022',completion:'Dec 2025',type:'Township',rera_id:'HRERA-GGM-502-2022'},
+]},
+
+{id:36,name:'Suncity Projects',city:'Gurugram',state:'Haryana',score:33,del:28,cases:112,comp:489,res:31,proj:12,banks:2,yr:2003,sent:1.6,rera:'Penalised',mca:'Active',cin:'U45200HR2003PTC039811',flags:['scam-risk','delay-risk','court-active','rera-penalised'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — CA 2901/2024',det:'RERA jurisdiction — Gurugram projects',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Suncity Parikrama',loc:'Gurugram, Haryana',status:'Stalled',pct:41,units:780,launch:'2012',completion:'TBD (was 2019)',type:'Residential',rera_id:'HRERA-GGM-044-2018'},
+{name:'Suncity Avenue 76',loc:'Gurugram, Haryana',status:'Stalled',pct:35,units:440,launch:'2014',completion:'TBD',type:'Residential',rera_id:'HRERA-GGM-062-2018'},
+]},
+
+{id:37,name:'Ireo Group',city:'Gurugram',state:'Haryana',score:18,del:12,cases:134,comp:678,res:18,proj:9,banks:1,yr:2004,sent:1.1,rera:'Penalised',mca:'NCLT Proceedings',cin:'U45400HR2005PTC036491',flags:['scam-risk','delay-risk','court-active','insolvency'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — SLP 8821/2024',det:'Criminal contempt — refund non-disbursement',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Ireo City',loc:'Gurugram, Haryana',status:'Stalled',pct:44,units:1400,launch:'2011',completion:'TBD (was 2017)',type:'Residential',rera_id:'HRERA-GGM-018-2018'},
+{name:'Ireo Skyon',loc:'Gurugram, Haryana',status:'Stalled',pct:38,units:520,launch:'2013',completion:'TBD (was 2019)',type:'Premium',rera_id:'HRERA-GGM-024-2018'},
+]},
+
+{id:38,name:'Unitech Limited',city:'Gurugram',state:'Haryana',score:14,del:8,cases:246,comp:1240,res:12,proj:18,banks:0,yr:1972,sent:1.0,rera:'Penalised',mca:'NCLT Proceedings',cin:'L74899DL1971PLC005838',flags:['scam-risk','delay-risk','court-active','insolvency','rera-penalised'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — SLP 8832/2024',det:'Criminal contempt — directors in custody',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Unitech Escape',loc:'Gurugram, Haryana',status:'Stalled',pct:38,units:1600,launch:'2009',completion:'TBD (was 2015)',type:'Residential',rera_id:'HRERA-GGM-008-2018'},
+{name:'Unitech Woodstock',loc:'Gurugram, Haryana',status:'Stalled',pct:41,units:1200,launch:'2010',completion:'TBD (was 2016)',type:'Residential',rera_id:'HRERA-GGM-011-2018'},
+{name:'Unitech Vistas',loc:'Noida, UP',status:'Stalled',pct:35,units:880,launch:'2011',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ004218'},
+]},
+
+{id:39,name:'Ansal API',city:'Delhi',state:'Delhi NCR',score:29,del:24,cases:142,comp:628,res:27,proj:22,banks:2,yr:1967,sent:1.4,rera:'Penalised',mca:'NCLT Proceedings',cin:'L45101DL1967PLC004759',flags:['scam-risk','delay-risk','court-active','insolvency','rera-penalised'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — SLP 6611/2024',det:'Recovery proceedings — stalled projects',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Ansal Sushant Lok III',loc:'Gurugram, Haryana',status:'Stalled',pct:44,units:1100,launch:'2010',completion:'TBD',type:'Residential',rera_id:'HRERA-GGM-009-2018'},
+{name:'Ansal Highland Park',loc:'Gurugram, Haryana',status:'Stalled',pct:38,units:700,launch:'2012',completion:'TBD',type:'Residential',rera_id:'HRERA-GGM-019-2018'},
+]},
+
+{id:40,name:'Omaxe Limited',city:'Delhi',state:'Delhi NCR',score:41,del:38,cases:89,comp:342,res:44,proj:24,banks:3,yr:1987,sent:2.1,rera:'Complaints Pending',mca:'Active',cin:'L74899DL1989PLC034194',flags:['delay-risk','court-active','rera-penalised'],
+courts:[{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 3341/2023',det:'Mass refund — Omaxe Cassia, Greater Noida',st:'Ruled against builder',sc:'cst-r'}],
+projects:[
+{name:'Omaxe World Street',loc:'Faridabad, Haryana',status:'Delayed',pct:38,units:1200,launch:'2015',completion:'TBD (was Mar 2022)',type:'Commercial',rera_id:'HRERA-PKL-088-2019'},
+{name:'Omaxe Cassia',loc:'Greater Noida, UP',status:'Stalled',pct:44,units:450,launch:'2013',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ018219'},
+{name:'Omaxe New Chandigarh',loc:'Mullanpur, Punjab',status:'Delayed',pct:41,units:1800,launch:'2016',completion:'TBD (was 2022)',type:'Township',rera_id:'PBRERA-SAS80-PRJ-2018-0428'},
+]},
+
+// ── UTTAR PRADESH ────────────────────────────────────────────────────────────
+{id:41,name:'Supertech Limited',city:'Noida',state:'Uttar Pradesh',score:21,del:19,cases:187,comp:892,res:23,proj:31,banks:2,yr:1995,sent:1.2,rera:'Complaints Pending',mca:'NCLT Proceedings',cin:'U45400UP1995PLC018745',flags:['scam-risk','delay-risk','court-active','insolvency'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — SLP 4421/2024',det:'Demolition + refund — Emerald Court, Noida',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Supertech Eco Village II',loc:'Greater Noida, UP',status:'Stalled',pct:38,units:1800,launch:'2011',completion:'TBD (was 2018)',type:'Residential',rera_id:'UPRERAPRJ012218'},
+{name:'Supertech Capetown',loc:'Noida, UP',status:'Stalled',pct:41,units:1200,launch:'2012',completion:'TBD (was 2020)',type:'Residential',rera_id:'UPRERAPRJ014219'},
+{name:'Supertech Hill Town',loc:'Sohna, Haryana',status:'Stalled',pct:28,units:960,launch:'2013',completion:'TBD',type:'Residential',rera_id:'HRERA-GGM-028-2018'},
+]},
+
+{id:42,name:'ATS Infrastructure',city:'Noida',state:'Uttar Pradesh',score:52,del:47,cases:64,comp:234,res:54,proj:17,banks:4,yr:1998,sent:2.6,rera:'Complaints Pending',mca:'Active',cin:'U45201UP1999PLC024182',flags:['delay-risk','court-active'],
+courts:[{type:'RERA',tc:'ct-rera',case:'UP RERA — A51800038892',det:'Penalty — ATS Nobility, Noida',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'ATS Nobility',loc:'Noida, UP',status:'Delayed',pct:48,units:840,launch:'2014',completion:'Jun 2025 (was Dec 2021)',type:'Residential',rera_id:'UPRERAPRJ024219'},
+{name:'ATS Le Grandiose',loc:'Noida, UP',status:'Delayed',pct:44,units:640,launch:'2015',completion:'Dec 2025 (was Jun 2022)',type:'Premium',rera_id:'UPRERAPRJ028219'},
+{name:'ATS Triumph',loc:'Noida, UP',status:'On track',pct:38,units:480,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'UPRERAPRJ098222'},
+]},
+
+{id:43,name:'Gaur Sons',city:'Greater Noida',state:'Uttar Pradesh',score:56,del:51,cases:49,comp:189,res:59,proj:21,banks:5,yr:1995,sent:2.7,rera:'Complaints Pending',mca:'Active',cin:'U45200UP1995PLC018922',flags:['delay-risk','court-active'],
+courts:[{type:'RERA',tc:'ct-rera',case:'UP RERA — GSR-2024-038',det:'Delay penalty — Gaur City 14th Avenue',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Gaur City 14th Avenue',loc:'Greater Noida, UP',status:'Delayed',pct:51,units:1600,launch:'2018',completion:'Dec 2025 (was Jun 2022)',type:'Residential',rera_id:'UPRERAPRJ048219'},
+{name:'Gaur Yamuna City',loc:'Yamuna Expressway, UP',status:'On track',pct:31,units:2400,launch:'2022',completion:'Mar 2026',type:'Township',rera_id:'UPRERAPRJ101222'},
+{name:'Gaur City 2, 16th Avenue',loc:'Greater Noida, UP',status:'Delayed',pct:44,units:880,launch:'2017',completion:'TBD (was 2023)',type:'Residential',rera_id:'UPRERAPRJ038218'},
+]},
+
+{id:44,name:'Amrapali Group',city:'Noida',state:'Uttar Pradesh',score:8,del:3,cases:312,comp:2100,res:5,proj:14,banks:0,yr:2003,sent:1.0,rera:'Penalised',mca:'NCLT Proceedings',cin:'U45200UP2003PLC028411',flags:['scam-risk','delay-risk','court-active','insolvency','rera-penalised'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — SLP 11111/2024',det:'Court receiver — all projects under NBCC',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Amrapali Sapphire',loc:'Noida, UP',status:'Stalled',pct:38,units:2800,launch:'2010',completion:'TBD — NBCC taking over',type:'Residential',rera_id:'UPRERAPRJ004218'},
+{name:'Amrapali Dream Valley',loc:'Greater Noida, UP',status:'Stalled',pct:31,units:3200,launch:'2011',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ006218'},
+{name:'Amrapali Golf Homes',loc:'Greater Noida, UP',status:'Stalled',pct:28,units:1800,launch:'2012',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ009218'},
+]},
+
+{id:45,name:'Jaypee Infratech',city:'Noida',state:'Uttar Pradesh',score:16,del:9,cases:278,comp:1890,res:10,proj:11,banks:0,yr:2007,sent:1.0,rera:'Penalised',mca:'NCLT Proceedings',cin:'U45200UP2007PLC033023',flags:['scam-risk','delay-risk','court-active','insolvency','rera-penalised'],
+courts:[{type:'SC',tc:'ct-sc',case:'Supreme Court — CA 8766/2024',det:'IRP vs homebuyers — resolution plan',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Wish Town',loc:'Noida Expressway, UP',status:'Stalled',pct:44,units:32000,launch:'2010',completion:'IBC ongoing',type:'Township',rera_id:'UPRERAPRJ002218'},
+{name:'Jaypee Greens Sports City',loc:'Greater Noida, UP',status:'Partial',pct:58,units:8000,launch:'2011',completion:'Phased',type:'Township',rera_id:'UPRERAPRJ003218'},
+]},
+
+{id:46,name:'Eldeco Group',city:'Noida',state:'Uttar Pradesh',score:72,del:67,cases:22,comp:84,res:81,proj:28,banks:8,yr:1975,sent:3.5,rera:'Registered',mca:'Active',cin:'L45201UP1985PLC007029',flags:[],
+courts:[],
+projects:[
+{name:'Eldeco Fairway Reserve',loc:'Greater Noida, UP',status:'On track',pct:71,units:240,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'UPRERAPRJ088222'},
+{name:'Eldeco Live by the Greens',loc:'Lucknow, UP',status:'On track',pct:55,units:380,launch:'2022',completion:'Mar 2025',type:'Residential',rera_id:'UPRERAPRJ091222'},
+{name:'Eldeco Acclaim',loc:'Noida, UP',status:'On track',pct:38,units:280,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'UPRERAPRJ094222'},
+]},
+
+// ── TAMIL NADU ───────────────────────────────────────────────────────────────
+{id:47,name:'TVS Emerald',city:'Chennai',state:'Tamil Nadu',score:83,del:80,cases:6,comp:22,res:94,proj:18,banks:11,yr:1977,sent:4.1,rera:'Registered',mca:'Active',cin:'U45200TN1977PTC007112',flags:[],
+courts:[],
+projects:[
+{name:'TVS Emerald Enclave',loc:'Chennai, Tamil Nadu',status:'On track',pct:68,units:400,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'TN/01/2021/0044'},
+{name:'TVS Emerald Gardens',loc:'Coimbatore, Tamil Nadu',status:'Completed',pct:100,units:280,launch:'2018',completion:'Jan 2024',type:'Residential',rera_id:'TN/02/2018/0019'},
+{name:'TVS Emerald GreenAcres',loc:'Chennai, Tamil Nadu',status:'On track',pct:38,units:320,launch:'2023',completion:'Dec 2025',type:'Premium',rera_id:'TN/01/2023/0112'},
+]},
+
+{id:48,name:'Casagrand Builder',city:'Chennai',state:'Tamil Nadu',score:79,del:75,cases:12,comp:44,res:87,proj:31,banks:9,yr:2003,sent:3.9,rera:'Registered',mca:'Active',cin:'U45200TN2003PTC050218',flags:[],
+courts:[],
+projects:[
+{name:'Casagrand First City',loc:'Poonamallee, Chennai',status:'On track',pct:62,units:560,launch:'2021',completion:'Jun 2025',type:'Township',rera_id:'TN/01/2021/0072'},
+{name:'Casagrand Lorenza',loc:'Bengaluru, Karnataka',status:'On track',pct:48,units:420,launch:'2022',completion:'Sep 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1201'},
+{name:'Casagrand Tudor',loc:'Bengaluru, Karnataka',status:'On track',pct:38,units:380,launch:'2023',completion:'Sep 2025',type:'Premium',rera_id:'PRM/KA/RERA/1251/1318'},
+{name:'Casagrand Glore',loc:'Chennai, Tamil Nadu',status:'On track',pct:44,units:440,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'TN/01/2022/0088'},
+]},
+
+{id:49,name:'Akshaya Pvt Ltd',city:'Chennai',state:'Tamil Nadu',score:80,del:77,cases:9,comp:31,res:90,proj:22,banks:9,yr:1995,sent:3.9,rera:'Registered',mca:'Active',cin:'U45200TN1995PTC031248',flags:[],
+courts:[],
+projects:[
+{name:'Akshaya Adora',loc:'OMR, Chennai',status:'On track',pct:55,units:480,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'TN/01/2022/0044'},
+{name:'Akshaya Tango',loc:'Porur, Chennai',status:'Completed',pct:100,units:320,launch:'2018',completion:'Jun 2023',type:'Residential',rera_id:'TN/01/2018/0038'},
+{name:'Akshaya Swastik Park',loc:'Coimbatore, Tamil Nadu',status:'On track',pct:44,units:240,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'TN/02/2022/0021'},
+]},
+
+// ── GUJARAT ──────────────────────────────────────────────────────────────────
+{id:50,name:'Adani Realty',city:'Ahmedabad',state:'Gujarat',score:84,del:81,cases:8,comp:29,res:93,proj:24,banks:12,yr:2010,sent:4.1,rera:'Registered',mca:'Active',cin:'U45200GJ2010PLC059891',flags:[],
+courts:[],
+projects:[
+{name:'Adani Shantigram',loc:'Ahmedabad, Gujarat',status:'On track',pct:58,units:2000,launch:'2022',completion:'Jun 2025',type:'Township',rera_id:'GJ-RERA-H-P-PV-AH-211-2022'},
+{name:'Adani Inspire',loc:'Navi Mumbai, Maharashtra',status:'On track',pct:35,units:680,launch:'2023',completion:'Mar 2026',type:'Premium',rera_id:'P52000051892'},
+{name:'Adani Samsara',loc:'Gurugram, Haryana',status:'On track',pct:68,units:340,launch:'2021',completion:'Dec 2024',type:'Luxury',rera_id:'HRERA-GGM-448-2021'},
+{name:'Adani The Views',loc:'Ahmedabad, Gujarat',status:'On track',pct:44,units:440,launch:'2022',completion:'Dec 2025',type:'Premium',rera_id:'GJ-RERA-H-P-PV-AH-224-2022'},
+]},
+
+{id:51,name:'Arvind SmartSpaces',city:'Ahmedabad',state:'Gujarat',score:76,del:72,cases:14,comp:50,res:83,proj:16,banks:8,yr:2008,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200GJ2008PLC052489',flags:[],
+courts:[],
+projects:[
+{name:'Arvind Expansia',loc:'Ahmedabad, Gujarat',status:'On track',pct:58,units:540,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'GJ-RERA-H-P-PV-AH-188-2021'},
+{name:'Arvind Uplands',loc:'Ahmedabad, Gujarat',status:'Completed',pct:100,units:320,launch:'2019',completion:'Jan 2024',type:'Residential',rera_id:'GJ-RERA-H-P-PV-AH-148-2019'},
+{name:'Arvind Sporcia',loc:'Ahmedabad, Gujarat',status:'On track',pct:35,units:480,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'GJ-RERA-H-P-PV-AH-241-2023'},
+]},
+
+// ── TELANGANA ────────────────────────────────────────────────────────────────
+{id:52,name:'My Home Group',city:'Hyderabad',state:'Telangana',score:81,del:78,cases:9,comp:33,res:91,proj:21,banks:10,yr:1991,sent:4.0,rera:'Registered',mca:'Active',cin:'U45200TG1991PTC013441',flags:[],
+courts:[],
+projects:[
+{name:'My Home Avatar',loc:'Hyderabad, Telangana',status:'On track',pct:68,units:1200,launch:'2021',completion:'Dec 2024',type:'Premium',rera_id:'TS-RERA-P-0041-2021'},
+{name:'My Home Jewel',loc:'Hyderabad, Telangana',status:'Completed',pct:100,units:480,launch:'2019',completion:'Mar 2023',type:'Residential',rera_id:'TS-RERA-P-0028-2019'},
+{name:'My Home Mosaic',loc:'Hyderabad, Telangana',status:'On track',pct:38,units:880,launch:'2023',completion:'Dec 2026',type:'Luxury',rera_id:'TS-RERA-P-0064-2023'},
+]},
+
+{id:53,name:'Aparna Constructions',city:'Hyderabad',state:'Telangana',score:79,del:75,cases:11,comp:40,res:88,proj:26,banks:9,yr:1996,sent:3.9,rera:'Registered',mca:'Active',cin:'U45200TG1996PTC023119',flags:[],
+courts:[],
+projects:[
+{name:'Aparna HillPark',loc:'Hyderabad, Telangana',status:'On track',pct:62,units:640,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'TS-RERA-P-0038-2021'},
+{name:'Aparna Sarovar',loc:'Hyderabad, Telangana',status:'Completed',pct:100,units:520,launch:'2018',completion:'Jun 2023',type:'Residential',rera_id:'TS-RERA-P-0022-2018'},
+{name:'Aparna Zenon',loc:'Hyderabad, Telangana',status:'On track',pct:35,units:480,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'TS-RERA-P-0058-2023'},
+]},
+
+{id:54,name:'Aliens Group',city:'Hyderabad',state:'Telangana',score:39,del:34,cases:81,comp:312,res:40,proj:7,banks:2,yr:2004,sent:1.8,rera:'Complaints Pending',mca:'NCLT Proceedings',cin:'U45200TG2004PTC042881',flags:['scam-risk','delay-risk','court-active','insolvency'],
+courts:[{type:'HC',tc:'ct-hc',case:'Telangana HC — WP 7741/2024',det:'Mass possession — Aliens Space Station',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Aliens Space Station',loc:'Hyderabad, Telangana',status:'Stalled',pct:44,units:3600,launch:'2013',completion:'TBD (was 2020)',type:'Residential',rera_id:'TS-RERA-P-0004-2018'},
+]},
+
+// ── RAJASTHAN ────────────────────────────────────────────────────────────────
+{id:55,name:'Mahima Group',city:'Jaipur',state:'Rajasthan',score:73,del:68,cases:20,comp:73,res:79,proj:16,banks:7,yr:1997,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200RJ1997PTC013291',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'Mahima Fluoriana',loc:'Jaipur, Rajasthan',status:'Delayed',pct:55,units:420,launch:'2019',completion:'Mar 2025 (was Jun 2023)',type:'Residential',rera_id:'RAJ/P/2019/0441'},
+{name:'Mahima Saubhagya',loc:'Jaipur, Rajasthan',status:'On track',pct:44,units:280,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'RAJ/P/2022/0892'},
+]},
+
+{id:56,name:'Manglam Group',city:'Jaipur',state:'Rajasthan',score:75,del:71,cases:16,comp:56,res:82,proj:14,banks:7,yr:1999,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200RJ1999PTC015819',flags:[],
+courts:[],
+projects:[
+{name:'Manglam Ananda',loc:'Jaipur, Rajasthan',status:'On track',pct:71,units:380,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'RAJ/P/2021/0612'},
+{name:'Manglam Signature',loc:'Jaipur, Rajasthan',status:'Completed',pct:100,units:240,launch:'2018',completion:'Mar 2023',type:'Residential',rera_id:'RAJ/P/2018/0388'},
+{name:'Manglam Prelude',loc:'Jaipur, Rajasthan',status:'On track',pct:35,units:320,launch:'2023',completion:'Jun 2026',type:'Premium',rera_id:'RAJ/P/2023/1012'},
+]},
+
+// ── KERALA ────────────────────────────────────────────────────────────────────
+{id:57,name:'Confident Group',city:'Kochi',state:'Kerala',score:78,del:74,cases:12,comp:42,res:86,proj:22,banks:9,yr:1993,sent:3.8,rera:'Registered',mca:'Active',cin:'U45200KL1993PLC007118',flags:[],
+courts:[],
+projects:[
+{name:'Confident Iris',loc:'Kochi, Kerala',status:'On track',pct:62,units:320,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'K-RERA-N-KO-61/2021'},
+{name:'Confident Casablanca',loc:'Kochi, Kerala',status:'Completed',pct:100,units:240,launch:'2018',completion:'Jan 2024',type:'Residential',rera_id:'K-RERA-N-KO-44/2018'},
+{name:'Confident Aqua Splendour',loc:'Kochi, Kerala',status:'On track',pct:38,units:280,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'K-RERA-N-KO-88/2023'},
+]},
+
+{id:58,name:'Skyline Builders',city:'Kochi',state:'Kerala',score:76,del:72,cases:14,comp:49,res:83,proj:18,banks:8,yr:1998,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200KL1998PLC011289',flags:[],
+courts:[],
+projects:[
+{name:'Skyline Greens',loc:'Kochi, Kerala',status:'On track',pct:58,units:280,launch:'2022',completion:'Sep 2025',type:'Residential',rera_id:'K-RERA-N-KO-72/2022'},
+{name:'Skyline Sandal',loc:'Kochi, Kerala',status:'Completed',pct:100,units:180,launch:'2018',completion:'Mar 2023',type:'Residential',rera_id:'K-RERA-N-KO-48/2018'},
+]},
+
+// ── WEST BENGAL ───────────────────────────────────────────────────────────────
+{id:59,name:'Merlin Group',city:'Kolkata',state:'West Bengal',score:76,del:72,cases:16,comp:57,res:82,proj:24,banks:8,yr:1984,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200WB1984PTC037418',flags:[],
+courts:[],
+projects:[
+{name:'Merlin Elita',loc:'New Town, Kolkata',status:'On track',pct:62,units:480,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'HIRA/P/NOR/2021/001891'},
+{name:'Merlin The One',loc:'Kolkata, West Bengal',status:'Completed',pct:100,units:320,launch:'2018',completion:'Jun 2023',type:'Premium',rera_id:'HIRA/P/NOR/2018/001122'},
+{name:'Merlin Nest',loc:'Salt Lake, Kolkata',status:'On track',pct:38,units:240,launch:'2023',completion:'Dec 2026',type:'Residential',rera_id:'HIRA/P/NOR/2023/002891'},
+]},
+
+{id:60,name:'Ambuja Neotia',city:'Kolkata',state:'West Bengal',score:79,del:75,cases:11,comp:39,res:87,proj:21,banks:9,yr:1989,sent:3.9,rera:'Registered',mca:'Active',cin:'U45200WB1989PLC047211',flags:[],
+courts:[],
+projects:[
+{name:'Utalika Luxury',loc:'Kolkata, West Bengal',status:'On track',pct:58,units:280,launch:'2022',completion:'Jun 2025',type:'Luxury',rera_id:'HIRA/P/NOR/2022/002441'},
+{name:'Neotia Espace',loc:'Kolkata, West Bengal',status:'Completed',pct:100,units:340,launch:'2018',completion:'Sep 2023',type:'Residential',rera_id:'HIRA/P/NOR/2018/001341'},
+{name:'Swabhumi Heritage',loc:'Kolkata, West Bengal',status:'On track',pct:35,units:180,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'HIRA/P/NOR/2023/003121'},
+]},
+
+// ── MORE BUILDERS ─────────────────────────────────────────────────────────────
+{id:61,name:'Tata Value Homes',city:'Pune',state:'Maharashtra',score:89,del:87,cases:3,comp:12,res:98,proj:19,banks:13,yr:2012,sent:4.5,rera:'Registered',mca:'Active',cin:'U45200MH2012PLC232899',flags:[],
+courts:[],
+projects:[
+{name:'Tata New Haven Mumbai',loc:'Boisar, Maharashtra',status:'On track',pct:55,units:640,launch:'2022',completion:'Mar 2025',type:'Affordable',rera_id:'P51700046219'},
+{name:'Tata Shubh Griha',loc:'Bengaluru, Karnataka',status:'Completed',pct:100,units:800,launch:'2018',completion:'Jun 2023',type:'Affordable',rera_id:'PRM/KA/RERA/1250/328'},
+{name:'Tata Amantra',loc:'Bhiwandi, Maharashtra',status:'On track',pct:44,units:1100,launch:'2022',completion:'Jun 2025',type:'Affordable',rera_id:'P51700047219'},
+]},
+
+{id:62,name:'Phoenix Mills',city:'Mumbai',state:'Maharashtra',score:83,del:80,cases:8,comp:24,res:93,proj:19,banks:11,yr:1905,sent:4.1,rera:'Registered',mca:'Active',cin:'L17100MH1905PLC000200',flags:[],
+courts:[],
+projects:[
+{name:'Kessaku',loc:'Bengaluru, Karnataka',status:'On track',pct:68,units:228,launch:'2021',completion:'Dec 2024',type:'Ultra-Luxury',rera_id:'PRM/KA/RERA/1251/0912'},
+{name:'Centrium',loc:'Chennai, Tamil Nadu',status:'On track',pct:55,units:160,launch:'2022',completion:'Mar 2025',type:'Luxury',rera_id:'TN/01/2022/0051'},
+{name:'One Wakad',loc:'Pune, Maharashtra',status:'On track',pct:35,units:320,launch:'2023',completion:'Dec 2025',type:'Premium',rera_id:'P52100052219'},
+]},
+
+{id:63,name:'Ramky Estates',city:'Hyderabad',state:'Telangana',score:76,del:72,cases:14,comp:51,res:83,proj:19,banks:8,yr:1994,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200TG1994PTC019281',flags:[],
+courts:[],
+projects:[
+{name:'Ramky One Galaxia',loc:'Hyderabad, Telangana',status:'On track',pct:58,units:800,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'TS-RERA-P-0048-2022'},
+{name:'Ramky Towers',loc:'Hyderabad, Telangana',status:'Completed',pct:100,units:320,launch:'2019',completion:'Jan 2024',type:'Residential',rera_id:'TS-RERA-P-0029-2019'},
+]},
+
+{id:64,name:'Gillco Developers',city:'Chandigarh',state:'Punjab',score:72,del:67,cases:18,comp:64,res:79,proj:14,banks:7,yr:1992,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200PB1992PTC012938',flags:[],
+courts:[],
+projects:[
+{name:'Gillco Palms',loc:'Mohali, Punjab',status:'On track',pct:62,units:340,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'PBRERA-SAS80-PRJ-2021-0612'},
+{name:'Gillco Hills',loc:'Chandigarh, Punjab',status:'Completed',pct:100,units:220,launch:'2018',completion:'Mar 2023',type:'Residential',rera_id:'PBRERA-SAS80-PRJ-2018-0388'},
+{name:'Gillco Valley',loc:'Mohali, Punjab',status:'On track',pct:38,units:280,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'PBRERA-SAS80-PRJ-2023-0892'},
+]},
+
+{id:65,name:'Vascon Engineers',city:'Pune',state:'Maharashtra',score:72,del:67,cases:20,comp:72,res:79,proj:14,banks:7,yr:1986,sent:3.5,rera:'Registered',mca:'Active',cin:'L45200MH1986PLC041375',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'Vascon Forest Edge',loc:'Pune, Maharashtra',status:'Delayed',pct:44,units:260,launch:'2020',completion:'Sep 2025 (was Dec 2023)',type:'Residential',rera_id:'P52100036219'},
+{name:'Vascon ECO',loc:'Pune, Maharashtra',status:'On track',pct:62,units:180,launch:'2022',completion:'Jun 2025',type:'Eco-Residential',rera_id:'P52100047819'},
+]},
+
+{id:66,name:'Rohan Builders',city:'Pune',state:'Maharashtra',score:76,del:71,cases:16,comp:57,res:82,proj:14,banks:8,yr:1993,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200MH1993PLC072118',flags:[],
+courts:[],
+projects:[
+{name:'Rohan Upavan',loc:'Pune, Maharashtra',status:'On track',pct:62,units:360,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'P52100038419'},
+{name:'Rohan Madhuban',loc:'Pune, Maharashtra',status:'Completed',pct:100,units:240,launch:'2018',completion:'Sep 2023',type:'Residential',rera_id:'P52100026219'},
+{name:'Rohan Iksha',loc:'Pune, Maharashtra',status:'On track',pct:35,units:280,launch:'2023',completion:'Jun 2026',type:'Residential',rera_id:'P52100051219'},
+]},
+
+{id:67,name:'Century Real Estate',city:'Bengaluru',state:'Karnataka',score:77,del:73,cases:14,comp:50,res:84,proj:16,banks:8,yr:1973,sent:3.8,rera:'Registered',mca:'Active',cin:'U45200KA1973PTC002941',flags:[],
+courts:[],
+projects:[
+{name:'Century Ethos',loc:'Bengaluru, Karnataka',status:'On track',pct:62,units:420,launch:'2021',completion:'Mar 2025',type:'Premium',rera_id:'PRM/KA/RERA/1251/0988'},
+{name:'Century Wintersun',loc:'Bengaluru, Karnataka',status:'Completed',pct:100,units:280,launch:'2018',completion:'Sep 2023',type:'Residential',rera_id:'PRM/KA/RERA/1250/388'},
+{name:'Century Indus',loc:'Bengaluru, Karnataka',status:'On track',pct:35,units:380,launch:'2023',completion:'Dec 2026',type:'Residential',rera_id:'PRM/KA/RERA/1252/0041'},
+]},
+
+{id:68,name:'Goel Ganga Group',city:'Indore',state:'Madhya Pradesh',score:70,del:65,cases:22,comp:80,res:77,proj:14,banks:7,yr:1996,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200MP1996PTC011219',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'Goel Ganga Platino',loc:'Indore, Madhya Pradesh',status:'Delayed',pct:44,units:320,launch:'2020',completion:'Mar 2025 (was Jun 2023)',type:'Residential',rera_id:'MP/RERA/2020/00441'},
+{name:'Goel Ganga Atharva',loc:'Indore, Madhya Pradesh',status:'On track',pct:38,units:240,launch:'2023',completion:'Dec 2025',type:'Residential',rera_id:'MP/RERA/2023/00891'},
+]},
+
+{id:69,name:'Utkal Builders',city:'Bhubaneswar',state:'Odisha',score:71,del:66,cases:18,comp:63,res:78,proj:13,banks:7,yr:1999,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200OR1999PTC006291',flags:[],
+courts:[],
+projects:[
+{name:'Utkal Vihara',loc:'Bhubaneswar, Odisha',status:'On track',pct:62,units:280,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'OD-RERA-P-0041-2021'},
+{name:'Utkal Accord',loc:'Bhubaneswar, Odisha',status:'On track',pct:38,units:180,launch:'2023',completion:'Dec 2026',type:'Residential',rera_id:'OD-RERA-P-0058-2023'},
+]},
+
+{id:70,name:'Sterling Developers',city:'Goa',state:'Goa',score:74,del:69,cases:16,comp:56,res:81,proj:11,banks:7,yr:1996,sent:3.6,rera:'Registered',mca:'Active',cin:'U45200GA1996PTC002118',flags:[],
+courts:[],
+projects:[
+{name:'Sterling Serenity',loc:'North Goa',status:'On track',pct:55,units:120,launch:'2022',completion:'Sep 2025',type:'Luxury Villas',rera_id:'RERA/GOA/2022/0041'},
+{name:'Sterling Aqua Breeze',loc:'South Goa',status:'On track',pct:35,units:80,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'RERA/GOA/2023/0062'},
+]},
+
+{id:71,name:'Assetz Property',city:'Bengaluru',state:'Karnataka',score:78,del:74,cases:13,comp:47,res:85,proj:16,banks:9,yr:2006,sent:3.9,rera:'Registered',mca:'Active',cin:'U45200KA2006PTC040918',flags:[],
+courts:[],
+projects:[
+{name:'Assetz 63 Degree East',loc:'Whitefield, Bengaluru',status:'On track',pct:55,units:480,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1048'},
+{name:'Assetz Marq',loc:'Bengaluru, Karnataka',status:'On track',pct:71,units:360,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'PRM/KA/RERA/1251/0942'},
+{name:'Assetz Canvas & Cove',loc:'Whitefield, Bengaluru',status:'On track',pct:35,units:540,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'PRM/KA/RERA/1252/0088'},
+]},
+
+{id:72,name:'Shriram Properties',city:'Bengaluru',state:'Karnataka',score:75,del:70,cases:20,comp:78,res:79,proj:22,banks:8,yr:1995,sent:3.6,rera:'Registered',mca:'Active',cin:'U70102KA2000PLC026884',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'RERA Karnataka — SRP-2024-022',det:'Delay — Shriram Blue, Bengaluru',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Shriram Blue',loc:'Bengaluru, Karnataka',status:'Delayed',pct:51,units:420,launch:'2020',completion:'Dec 2025 (was Jun 2024)',type:'Residential',rera_id:'PRM/KA/RERA/1251/0888'},
+{name:'Shriram Summitt',loc:'Bengaluru, Karnataka',status:'Completed',pct:100,units:540,launch:'2019',completion:'Sep 2024',type:'Residential',rera_id:'PRM/KA/RERA/1250/411'},
+{name:'Shriram Chirping Woods',loc:'Bengaluru, Karnataka',status:'On track',pct:38,units:340,launch:'2023',completion:'Jun 2026',type:'Residential',rera_id:'PRM/KA/RERA/1252/0031'},
+]},
+
+{id:73,name:'Pivotal Infrastructure',city:'Noida',state:'Uttar Pradesh',score:44,del:39,cases:71,comp:262,res:46,proj:9,banks:3,yr:2002,sent:2.1,rera:'Complaints Pending',mca:'Active',cin:'U45200UP2002PTC027121',flags:['delay-risk','court-active'],
+courts:[{type:'RERA',tc:'ct-rera',case:'UP RERA — PIV-2024-021',det:'Registration suspended — Pivotal Paradise, Noida',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Pivotal Paradise',loc:'Noida, UP',status:'Stalled',pct:44,units:640,launch:'2015',completion:'TBD (was 2020)',type:'Residential',rera_id:'UPRERAPRJ041218'},
+{name:'Pivotal Devaan',loc:'Noida, UP',status:'Stalled',pct:38,units:420,launch:'2016',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ044218'},
+]},
+
+{id:74,name:'Malpani Group',city:'Pune',state:'Maharashtra',score:64,del:59,cases:30,comp:110,res:68,proj:10,banks:5,yr:2002,sent:3.0,rera:'Complaints Pending',mca:'Active',cin:'U45200MH2002PTC136821',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'MahaRERA — MLN-2024-011',det:'Penalty — Malpani Grande, Pune',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Malpani Grande',loc:'Pune, Maharashtra',status:'Delayed',pct:44,units:380,launch:'2019',completion:'TBD (was Dec 2022)',type:'Residential',rera_id:'P52100034219'},
+]},
+
+{id:75,name:'Navanaami Constructions',city:'Vijayawada',state:'Andhra Pradesh',score:70,del:65,cases:19,comp:68,res:78,proj:12,banks:7,yr:2000,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200AP2000PTC032118',flags:[],
+courts:[],
+projects:[
+{name:'Navanaami Greenwood',loc:'Vijayawada, Andhra Pradesh',status:'On track',pct:62,units:360,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'AP-RERA-2021-00412'},
+{name:'Navanaami Heights',loc:'Guntur, Andhra Pradesh',status:'Completed',pct:100,units:200,launch:'2018',completion:'Sep 2023',type:'Residential',rera_id:'AP-RERA-2018-00219'},
+]},
+
+{id:76,name:'Antriksh Group',city:'Noida',state:'Uttar Pradesh',score:38,del:33,cases:88,comp:341,res:39,proj:12,banks:3,yr:1986,sent:1.9,rera:'Complaints Pending',mca:'Active',cin:'U45200UP1986PTC007119',flags:['scam-risk','delay-risk','court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Allahabad HC — WP 8821/2024',det:'Possession dispute — Antriksh Golf View',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Antriksh Golf View',loc:'Noida, UP',status:'Stalled',pct:62,units:820,launch:'2012',completion:'TBD (was 2019)',type:'Residential',rera_id:'UPRERAPRJ018218'},
+{name:'Antriksh Golf View II',loc:'Noida, UP',status:'Stalled',pct:44,units:540,launch:'2014',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ022218'},
+]},
+
+{id:77,name:'Savvy Infrastructure',city:'Ahmedabad',state:'Gujarat',score:77,del:73,cases:14,comp:48,res:83,proj:16,banks:8,yr:1999,sent:3.8,rera:'Registered',mca:'Active',cin:'U45200GJ1999PTC035811',flags:[],
+courts:[],
+projects:[
+{name:'Savvy Swaraaj',loc:'Ahmedabad, Gujarat',status:'On track',pct:62,units:480,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'GJ-RERA-H-P-PV-AH-178-2021'},
+{name:'Savvy Habitats',loc:'Ahmedabad, Gujarat',status:'Completed',pct:100,units:320,launch:'2018',completion:'Mar 2023',type:'Residential',rera_id:'GJ-RERA-H-P-PV-AH-141-2018'},
+]},
+
+{id:78,name:'Incor Infrastructure',city:'Hyderabad',state:'Telangana',score:74,del:69,cases:17,comp:61,res:80,proj:14,banks:7,yr:2005,sent:3.6,rera:'Registered',mca:'Active',cin:'U45200TG2005PTC047219',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'Incor Carmel Heights',loc:'Hyderabad, Telangana',status:'Delayed',pct:51,units:480,launch:'2020',completion:'Dec 2024 (was Mar 2023)',type:'Residential',rera_id:'TS-RERA-P-0038-2020'},
+{name:'Incor One City',loc:'Vijayawada, Andhra Pradesh',status:'On track',pct:44,units:640,launch:'2022',completion:'Jun 2025',type:'Township',rera_id:'AP-RERA-2022-00512'},
+]},
+
+{id:79,name:'Siddha Group',city:'Kolkata',state:'West Bengal',score:73,del:68,cases:20,comp:72,res:79,proj:19,banks:7,yr:1998,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200WB1998PLC087214',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'WB RERA — SDH-2024-011',det:'Delay — Siddha Suburbia, Rajarhat',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Siddha Suburbia',loc:'Rajarhat, Kolkata',status:'Delayed',pct:51,units:380,launch:'2020',completion:'Dec 2024 (was Mar 2023)',type:'Residential',rera_id:'HIRA/P/NOR/2020/001812'},
+{name:'Siddha Galaxia',loc:'Kolkata, West Bengal',status:'On track',pct:38,units:280,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'HIRA/P/NOR/2022/002218'},
+]},
+
+{id:80,name:'Rameswara Infratech',city:'Kolkata',state:'West Bengal',score:58,del:53,cases:41,comp:151,res:62,proj:11,banks:5,yr:2005,sent:2.8,rera:'Complaints Pending',mca:'Active',cin:'U45200WB2005PTC106218',flags:['delay-risk','court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Calcutta HC — WP 3312/2024',det:'Delayed possession — Rameswara Belleza',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Rameswara Belleza',loc:'Kolkata, West Bengal',status:'Stalled',pct:44,units:420,launch:'2016',completion:'TBD (was 2021)',type:'Residential',rera_id:'HIRA/P/NOR/2018/001219'},
+]},
+
+{id:81,name:'G Square Housing',city:'Chennai',state:'Tamil Nadu',score:71,del:66,cases:21,comp:76,res:77,proj:19,banks:7,yr:2009,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200TN2009PTC071218',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'TN RERA — GSQ-2024-007',det:'Delay notice — G Square Resorto',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'G Square Resorto',loc:'Oragadam, Chennai',status:'Delayed',pct:44,units:520,launch:'2020',completion:'Jun 2025 (was Sep 2023)',type:'Residential',rera_id:'TN/01/2020/0061'},
+{name:'G Square Natures Vibe',loc:'Chennai, Tamil Nadu',status:'On track',pct:38,units:320,launch:'2023',completion:'Dec 2025',type:'Residential',rera_id:'TN/01/2023/0081'},
+]},
+
+{id:82,name:'Vijay Shanthi Builders',city:'Chennai',state:'Tamil Nadu',score:77,del:73,cases:14,comp:51,res:84,proj:26,banks:8,yr:1987,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200TN1987PLC015389',flags:[],
+courts:[],
+projects:[
+{name:'VS Adora',loc:'Chennai, Tamil Nadu',status:'On track',pct:62,units:360,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'TN/01/2021/0061'},
+{name:'VS Mahindra City',loc:'Chennai, Tamil Nadu',status:'Completed',pct:100,units:1200,launch:'2017',completion:'Mar 2023',type:'Township',rera_id:'TN/01/2017/0021'},
+{name:'VS Springfields',loc:'Chennai, Tamil Nadu',status:'On track',pct:38,units:280,launch:'2023',completion:'Dec 2025',type:'Residential',rera_id:'TN/01/2023/0092'},
+]},
+
+{id:83,name:'Radiance Realty',city:'Chennai',state:'Tamil Nadu',score:74,del:70,cases:18,comp:62,res:80,proj:14,banks:8,yr:2007,sent:3.6,rera:'Registered',mca:'Active',cin:'U45200TN2007PTC063421',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'TN RERA — RDR-2024-014',det:'Extension — Radiance Mandarin, Chennai',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Radiance Mandarin',loc:'Chennai, Tamil Nadu',status:'Delayed',pct:55,units:380,launch:'2020',completion:'Dec 2024 (was Mar 2023)',type:'Residential',rera_id:'TN/01/2020/0048'},
+{name:'Radiance Mercury',loc:'Chennai, Tamil Nadu',status:'On track',pct:38,units:280,launch:'2023',completion:'Jun 2026',type:'Residential',rera_id:'TN/01/2023/0102'},
+]},
+
+{id:84,name:'Wave City',city:'Chandigarh',state:'Punjab',score:47,del:42,cases:74,comp:281,res:49,proj:11,banks:3,yr:2004,sent:2.2,rera:'Complaints Pending',mca:'Active',cin:'U45200PB2004PTC028981',flags:['delay-risk','court-active'],
+courts:[{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 8821/2024',det:'Mass delayed possession — Wave City, Mohali',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Wave City Mohali',loc:'Mohali, Punjab',status:'Delayed',pct:44,units:1400,launch:'2014',completion:'TBD (was 2021)',type:'Township',rera_id:'PBRERA-SAS80-PRJ-2018-0411'},
+{name:'Wave Estate',loc:'Mohali, Punjab',status:'Stalled',pct:38,units:680,launch:'2016',completion:'TBD',type:'Residential',rera_id:'PBRERA-SAS80-PRJ-2019-0441'},
+]},
+
+{id:85,name:'Shraddha Group',city:'Indore',state:'Madhya Pradesh',score:65,del:60,cases:28,comp:102,res:70,proj:9,banks:5,yr:2003,sent:3.1,rera:'Registered',mca:'Active',cin:'U45200MP2003PTC016821',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'Shraddha Prakash',loc:'Indore, Madhya Pradesh',status:'On track',pct:44,units:240,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'MP/RERA/2022/00698'},
+]},
+
+{id:86,name:'Confident (Kerala)',city:'Kochi',state:'Kerala',score:76,del:72,cases:14,comp:49,res:83,proj:18,banks:8,yr:1998,sent:3.7,rera:'Registered',mca:'Active',cin:'U45200KL1998PLC011289',flags:[],
+courts:[],
+projects:[
+{name:'Confident Eves Garden',loc:'Kochi, Kerala',status:'On track',pct:55,units:180,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'K-RERA-N-KO-78/2022'},
+{name:'Confident Aqua Regency',loc:'Kochi, Kerala',status:'Completed',pct:100,units:240,launch:'2018',completion:'Mar 2023',type:'Residential',rera_id:'K-RERA-N-KO-51/2018'},
+]},
+
+{id:87,name:'Rishabh Group',city:'Ranchi',state:'Jharkhand',score:65,del:60,cases:22,comp:80,res:71,proj:9,banks:5,yr:2000,sent:3.1,rera:'Registered',mca:'Active',cin:'U45200JH2000PTC007281',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'Rishabh Greens',loc:'Ranchi, Jharkhand',status:'Delayed',pct:44,units:180,launch:'2020',completion:'Jun 2025 (was Dec 2023)',type:'Residential',rera_id:'JH-RERA-2020-0041'},
+]},
+
+{id:88,name:'Naiknavare Developers',city:'Pune',state:'Maharashtra',score:74,del:69,cases:18,comp:64,res:80,proj:12,banks:7,yr:1985,sent:3.6,rera:'Registered',mca:'Active',cin:'U45200MH1985PLC035711',flags:['delay-risk'],
+courts:[{type:'RERA',tc:'ct-rera',case:'MahaRERA — NKN-2024-008',det:'Delay — Naiknavare Avon Vista, Pune',st:'Pending',sc:'cst-p'}],
+projects:[
+{name:'Naiknavare Avon Vista',loc:'Pune, Maharashtra',status:'Delayed',pct:55,units:320,launch:'2020',completion:'Jun 2025 (was Sep 2023)',type:'Residential',rera_id:'P52100036419'},
+{name:'Naiknavare Dwarka',loc:'Pune, Maharashtra',status:'Completed',pct:100,units:240,launch:'2017',completion:'Mar 2023',type:'Residential',rera_id:'P52100022419'},
+]},
+
+{id:89,name:'Alcon Landmark',city:'Goa',state:'Goa',score:71,del:66,cases:19,comp:68,res:78,proj:9,banks:6,yr:2001,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200GA2001PTC003219',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'Alcon Sonnette',loc:'North Goa',status:'Delayed',pct:44,units:80,launch:'2020',completion:'Dec 2024 (was Mar 2023)',type:'Premium',rera_id:'RERA/GOA/2020/0031'},
+]},
+
+{id:90,name:'DRA Homes',city:'Bhopal',state:'Madhya Pradesh',score:68,del:63,cases:24,comp:88,res:74,proj:11,banks:6,yr:2005,sent:3.2,rera:'Registered',mca:'Active',cin:'U45200MP2005PTC019812',flags:['delay-risk'],
+courts:[],
+projects:[
+{name:'DRA Pristine',loc:'Bhopal, Madhya Pradesh',status:'Delayed',pct:44,units:280,launch:'2020',completion:'Sep 2025 (was Dec 2023)',type:'Residential',rera_id:'MP/RERA/2020/00521'},
+{name:'DRA Grand Woods',loc:'Indore, Madhya Pradesh',status:'On track',pct:38,units:220,launch:'2023',completion:'Jun 2026',type:'Residential',rera_id:'MP/RERA/2023/00912'},
+]},
+  // ── BPTP & FARIDABAD/NCR BUILDERS (NEW) ──────────────────────────────────
+  {id:106,name:'BPTP Limited',city:'Faridabad',state:'Haryana',score:43,del:38,cases:98,comp:412,res:41,proj:28,banks:3,yr:2003,sent:1.9,rera:'Complaints Pending',mca:'Active',cin:'U45200HR2003PLC038821',flags:['delay-risk','court-active','rera-penalised'],
+  courts:[
+    {type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 4411/2024',det:'Delayed possession — BPTP Parkland Pride, Faridabad',st:'Pending',sc:'cs-pending'},
+    {type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 2891/2023',det:'Mass refund + interest — BPTP Amstoria, Gurugram',st:'Pending',sc:'cs-pending'},
+    {type:'RERA',tc:'ct-rera',case:'Haryana RERA — BPTP-2024-HR-038',det:'Penalty + show-cause on 4 projects',st:'Pending',sc:'cs-pending'},
+  ],
+  projects:[
+    {name:'BPTP Parkland Pride',loc:'Faridabad, Haryana',status:'Stalled',pct:62,units:1800,launch:'2011',completion:'TBD (was 2018)',type:'Residential',rera_id:'HRERA-PKL-088-2018'},
+    {name:'BPTP Amstoria',loc:'Gurugram, Haryana',status:'Stalled',pct:51,units:1200,launch:'2012',completion:'TBD (was 2019)',type:'Residential',rera_id:'HRERA-GGM-091-2018'},
+    {name:'BPTP The Terrain',loc:'Faridabad, Haryana',status:'Delayed',pct:38,units:980,launch:'2014',completion:'TBD (was 2020)',type:'Residential',rera_id:'HRERA-PKL-112-2019'},
+    {name:'BPTP Park Serene',loc:'Faridabad, Haryana',status:'Stalled',pct:44,units:640,launch:'2013',completion:'TBD (was 2019)',type:'Residential',rera_id:'HRERA-PKL-092-2018'},
+    {name:'BPTP Spacio',loc:'Sector 37D, Gurugram',status:'Delayed',pct:55,units:420,launch:'2015',completion:'TBD (was 2021)',type:'Residential',rera_id:'HRERA-GGM-128-2019'},
+    {name:'BPTP Visionaire',loc:'Sector 70A, Gurugram',status:'On track',pct:44,units:320,launch:'2022',completion:'Dec 2025',type:'Premium',rera_id:'HRERA-GGM-541-2022'},
+  ]},
+
+  // ── ADDITIONAL HARYANA / NCR ──────────────────────────────────────────────
+  {id:107,name:'Bestech Group',city:'Gurugram',state:'Haryana',score:58,del:52,cases:41,comp:162,res:60,proj:14,banks:5,yr:2001,sent:2.8,rera:'Complaints Pending',mca:'Active',cin:'U45200HR2001PLC034219',flags:['delay-risk','court-active'],
+  courts:[{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 5512/2024',det:'Delayed possession — Bestech Park View Spa, Gurugram',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Bestech Park View Spa',loc:'Sector 47, Gurugram',status:'Delayed',pct:58,units:780,launch:'2013',completion:'TBD (was 2020)',type:'Residential',rera_id:'HRERA-GGM-061-2018'},
+    {name:'Bestech Park View Grand Spa',loc:'Sector 81, Gurugram',status:'On track',pct:44,units:440,launch:'2022',completion:'Dec 2025',type:'Premium',rera_id:'HRERA-GGM-498-2022'},
+  ]},
+
+  {id:108,name:'CHD Developers',city:'Gurugram',state:'Haryana',score:51,del:45,cases:56,comp:218,res:53,proj:11,banks:4,yr:2004,sent:2.5,rera:'Complaints Pending',mca:'Active',cin:'U45200HR2004PTC036219',flags:['delay-risk','court-active'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'Haryana RERA — CHD-2024-HR-029',det:'Delayed delivery penalty — CHD City, Karnal',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'CHD City',loc:'Karnal, Haryana',status:'Delayed',pct:44,units:1200,launch:'2013',completion:'TBD (was 2020)',type:'Integrated Township',rera_id:'HRERA-KRNL-018-2018'},
+    {name:'CHD Avenue 71',loc:'Sector 71, Gurugram',status:'On track',pct:55,units:280,launch:'2022',completion:'Jun 2025',type:'Commercial',rera_id:'HRERA-GGM-512-2022'},
+  ]},
+
+  {id:109,name:'Pioneer Urban',city:'Gurugram',state:'Haryana',score:62,del:57,cases:34,comp:128,res:68,proj:12,banks:6,yr:1997,sent:3.1,rera:'Registered',mca:'Active',cin:'U45200HR1997PTC028219',flags:['delay-risk'],
+  courts:[{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 1441/2023',det:'Delayed possession — Pioneer Park PFC, Gurugram',st:'Resolved',sc:'cs-resolved'}],
+  projects:[
+    {name:'Pioneer Park PFC',loc:'Sector 61, Gurugram',status:'Delayed',pct:68,units:620,launch:'2015',completion:'TBD (was 2021)',type:'Residential',rera_id:'HRERA-GGM-099-2018'},
+    {name:'Pioneer Araya',loc:'Sector 62, Gurugram',status:'On track',pct:44,units:280,launch:'2022',completion:'Dec 2025',type:'Luxury',rera_id:'HRERA-GGM-519-2022'},
+  ]},
+
+  {id:110,name:'Pareena Infrastructure',city:'Gurugram',state:'Haryana',score:55,del:49,cases:48,comp:185,res:57,proj:10,banks:4,yr:2003,sent:2.6,rera:'Complaints Pending',mca:'Active',cin:'U45200HR2003PTC037219',flags:['delay-risk','court-active'],
+  courts:[{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 6312/2024',det:'Mass possession delay — Pareena The Esencia',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Pareena The Esencia',loc:'Sector 77, Gurugram',status:'Stalled',pct:44,units:880,launch:'2012',completion:'TBD (was 2019)',type:'Residential',rera_id:'HRERA-GGM-072-2018'},
+    {name:'Pareena Laxmi Apartment',loc:'Sector 68, Gurugram',status:'On track',pct:58,units:360,launch:'2021',completion:'Jun 2025',type:'Residential',rera_id:'HRERA-GGM-471-2021'},
+  ]},
+
+  {id:111,name:'ROF Infratech',city:'Gurugram',state:'Haryana',score:59,del:53,cases:38,comp:142,res:62,proj:9,banks:5,yr:2007,sent:2.9,rera:'Complaints Pending',mca:'Active',cin:'U45200HR2007PTC041219',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'Haryana RERA — ROF-2024-HR-021',det:'Extension — ROF Ananda, Sector 95',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'ROF Ananda',loc:'Sector 95, Gurugram',status:'Delayed',pct:51,units:640,launch:'2016',completion:'TBD (was 2022)',type:'Affordable',rera_id:'HRERA-GGM-118-2019'},
+    {name:'ROF Aalayas',loc:'Sector 102, Gurugram',status:'On track',pct:44,units:480,launch:'2022',completion:'Dec 2025',type:'Affordable',rera_id:'HRERA-GGM-521-2022'},
+  ]},
+
+  {id:112,name:'Tulip Infratech',city:'Gurugram',state:'Haryana',score:48,del:42,cases:62,comp:241,res:50,proj:8,banks:3,yr:2006,sent:2.3,rera:'Complaints Pending',mca:'Active',cin:'U45200HR2006PTC039219',flags:['delay-risk','court-active'],
+  courts:[{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 7712/2024',det:'Mass delay — Tulip Violet, Sector 69',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Tulip Violet',loc:'Sector 69, Gurugram',status:'Stalled',pct:44,units:1100,launch:'2013',completion:'TBD (was 2020)',type:'Residential',rera_id:'HRERA-GGM-082-2018'},
+    {name:'Tulip Orange',loc:'Sector 70, Gurugram',status:'Stalled',pct:38,units:800,launch:'2014',completion:'TBD',type:'Residential',rera_id:'HRERA-GGM-086-2018'},
+  ]},
+
+  // ── DELHI NCR ──────────────────────────────────────────────────────────────
+  {id:113,name:'Godrej Properties (NCR)',city:'Noida',state:'Uttar Pradesh',score:87,del:84,cases:4,comp:18,res:96,proj:12,banks:13,yr:2008,sent:4.3,rera:'Registered',mca:'Active',cin:'U45200UP2008PLC036219',flags:[],
+  courts:[],
+  projects:[
+    {name:'Godrej Tropical Isle',loc:'Sector 146, Noida',status:'On track',pct:31,units:840,launch:'2023',completion:'Dec 2026',type:'Premium',rera_id:'UPRERAPRJ191234'},
+    {name:'Godrej South Estate',loc:'Okhla, Delhi',status:'On track',pct:55,units:420,launch:'2022',completion:'Jun 2025',type:'Luxury',rera_id:'DLRERA2022P0041'},
+    {name:'Godrej Nurture Phase 2',loc:'Greater Noida',status:'On track',pct:44,units:560,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'UPRERAPRJ188222'},
+  ]},
+
+  {id:114,name:'ABA Corp',city:'Noida',state:'Uttar Pradesh',score:44,del:38,cases:72,comp:278,res:46,proj:8,banks:3,yr:2004,sent:2.1,rera:'Complaints Pending',mca:'Active',cin:'U45200UP2004PLC031219',flags:['delay-risk','court-active'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'UP RERA — ABA-2024-022',det:'Penalty — ABA Cleo County, Noida',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'ABA Cleo County',loc:'Sector 121, Noida',status:'Delayed',pct:48,units:780,launch:'2014',completion:'TBD (was 2021)',type:'Residential',rera_id:'UPRERAPRJ034218'},
+    {name:'ABA Olive County',loc:'Sector 5, Greater Noida',status:'Stalled',pct:38,units:540,launch:'2015',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ038218'},
+  ]},
+
+  {id:115,name:'Logix Group',city:'Noida',state:'Uttar Pradesh',score:49,del:43,cases:61,comp:234,res:51,proj:9,banks:4,yr:2002,sent:2.4,rera:'Complaints Pending',mca:'Active',cin:'U45200UP2002PLC028219',flags:['delay-risk','court-active'],
+  courts:[{type:'HC',tc:'ct-hc',case:'Allahabad HC — WP 9812/2024',det:'Possession delay — Logix Blossom County, Noida',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Logix Blossom County',loc:'Sector 137, Noida',status:'Delayed',pct:51,units:1200,launch:'2012',completion:'TBD (was 2019)',type:'Residential',rera_id:'UPRERAPRJ021218'},
+    {name:'Logix Blossom Zest',loc:'Sector 143, Noida',status:'Stalled',pct:38,units:880,launch:'2014',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ026218'},
+  ]},
+
+  {id:116,name:'Panchsheel Buildtech',city:'Greater Noida',state:'Uttar Pradesh',score:46,del:40,cases:68,comp:261,res:48,proj:8,banks:3,yr:2005,sent:2.2,rera:'Complaints Pending',mca:'Active',cin:'U45200UP2005PLC032219',flags:['delay-risk','court-active'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'UP RERA — PNCH-2024-019',det:'Registration suspended — Panchsheel Pratishtha',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Panchsheel Pratishtha',loc:'Sector 75, Noida',status:'Stalled',pct:41,units:960,launch:'2013',completion:'TBD (was 2020)',type:'Residential',rera_id:'UPRERAPRJ030218'},
+    {name:'Panchsheel Green 1',loc:'Greater Noida West',status:'Stalled',pct:35,units:720,launch:'2014',completion:'TBD',type:'Residential',rera_id:'UPRERAPRJ033218'},
+  ]},
+
+  {id:117,name:'Trident Realty',city:'Gurugram',state:'Haryana',score:60,del:54,cases:36,comp:138,res:64,proj:10,banks:5,yr:1999,sent:3.0,rera:'Registered',mca:'Active',cin:'U45200HR1999PTC031219',flags:['delay-risk'],
+  courts:[{type:'NCDRC',tc:'ct-ncdrc',case:'NCDRC — CC 1291/2023',det:'Delayed possession — Trident Hills, Panchkula',st:'Resolved',sc:'cs-resolved'}],
+  projects:[
+    {name:'Trident Hills',loc:'Panchkula, Haryana',status:'On track',pct:68,units:480,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'HRERA-PKL-441-2021'},
+    {name:'Trident Embassy Reso',loc:'Greater Noida West',status:'Delayed',pct:44,units:640,launch:'2017',completion:'TBD (was 2022)',type:'Residential',rera_id:'UPRERAPRJ044218'},
+  ]},
+
+  // ── RAJASTHAN EXPANDED ─────────────────────────────────────────────────────
+  {id:118,name:'Puravankara (Jaipur)',city:'Jaipur',state:'Rajasthan',score:74,del:69,cases:16,comp:58,res:80,proj:8,banks:8,yr:2019,sent:3.6,rera:'Registered',mca:'Active',cin:'U45200RJ2019PTC042219',flags:[],
+  courts:[],
+  projects:[
+    {name:'Purva Atmosphere Jaipur',loc:'Ajmer Road, Jaipur',status:'On track',pct:48,units:480,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'RAJ/P/2022/0812'},
+    {name:'Purva Plots Jaipur',loc:'Sitapura, Jaipur',status:'On track',pct:62,units:200,launch:'2021',completion:'Dec 2024',type:'Plotted',rera_id:'RAJ/P/2021/0682'},
+  ]},
+
+  {id:119,name:'Kunal Group',city:'Jaipur',state:'Rajasthan',score:67,del:62,cases:24,comp:88,res:72,proj:9,banks:6,yr:1998,sent:3.2,rera:'Registered',mca:'Active',cin:'U45200RJ1998PTC014219',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'Rajasthan RERA — KNL-2024-011',det:'Extension — Kunal Aspiree, Jaipur',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Kunal Aspiree',loc:'Vaishali Nagar, Jaipur',status:'Delayed',pct:44,units:360,launch:'2019',completion:'Sep 2025 (was Dec 2023)',type:'Residential',rera_id:'RAJ/P/2019/0512'},
+    {name:'Kunal Esfera',loc:'Jaipur, Rajasthan',status:'On track',pct:38,units:280,launch:'2022',completion:'Jun 2026',type:'Residential',rera_id:'RAJ/P/2022/0892'},
+  ]},
+
+  // ── PUNE EXPANDED ──────────────────────────────────────────────────────────
+  {id:120,name:'Megapolis Smart Homes',city:'Pune',state:'Maharashtra',score:71,del:66,cases:22,comp:81,res:76,proj:8,banks:7,yr:2008,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200MH2008PLC184219',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'MahaRERA — MGP-2024-016',det:'Extension — Megapolis Smart Homes Phase 3',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Megapolis Smart Homes Phase 3',loc:'Hinjewadi, Pune',status:'Delayed',pct:51,units:1800,launch:'2018',completion:'Dec 2025 (was Mar 2023)',type:'Residential',rera_id:'P52100033219'},
+    {name:'Megapolis Splendour',loc:'Hinjewadi, Pune',status:'On track',pct:44,units:640,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'P52100047819'},
+  ]},
+
+  {id:121,name:'Sobha (Pune)',city:'Pune',state:'Maharashtra',score:84,del:81,cases:5,comp:18,res:94,proj:7,banks:11,yr:2015,sent:4.2,rera:'Registered',mca:'Active',cin:'U45200MH2015PLC261219',flags:[],
+  courts:[],
+  projects:[
+    {name:'Sobha Sentosa',loc:'Undri, Pune',status:'On track',pct:55,units:560,launch:'2022',completion:'Mar 2025',type:'Premium',rera_id:'P52100048219'},
+    {name:'Sobha Arbor',loc:'Baner, Pune',status:'On track',pct:38,units:320,launch:'2023',completion:'Dec 2025',type:'Premium',rera_id:'P52100051819'},
+  ]},
+
+  {id:122,name:'Pride Purple',city:'Pune',state:'Maharashtra',score:72,del:67,cases:19,comp:70,res:78,proj:11,banks:7,yr:1997,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200MH1997PLC108219',flags:['delay-risk'],
+  courts:[],
+  projects:[
+    {name:'Pride Purple Park Titanium',loc:'Wakad, Pune',status:'On track',pct:62,units:320,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'P52100038919'},
+    {name:'Pride World City',loc:'Charholi, Pune',status:'Delayed',pct:44,units:1200,launch:'2018',completion:'Jun 2025 (was Dec 2022)',type:'Township',rera_id:'P52100031219'},
+  ]},
+
+  // ── BENGALURU EXPANDED ────────────────────────────────────────────────────
+  {id:123,name:'Mahaveer Group',city:'Bengaluru',state:'Karnataka',score:73,del:68,cases:19,comp:68,res:80,proj:16,banks:7,yr:1994,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200KA1994PTC016712',flags:['delay-risk'],
+  courts:[],
+  projects:[
+    {name:'Mahaveer Ranches',loc:'Attibele, Bengaluru',status:'Delayed',pct:51,units:420,launch:'2019',completion:'Mar 2025 (was Jun 2023)',type:'Residential',rera_id:'PRM/KA/RERA/1250/392'},
+    {name:'Mahaveer Tranquil',loc:'Mysore Road, Bengaluru',status:'On track',pct:44,units:320,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1228'},
+  ]},
+
+  {id:124,name:'Skylark Mansions',city:'Bengaluru',state:'Karnataka',score:71,del:66,cases:20,comp:73,res:78,proj:12,banks:7,yr:2000,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200KA2000PTC026219',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'RERA Karnataka — SKL-2024-018',det:'Delay — Skylark Ithaca, Bengaluru',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Skylark Ithaca',loc:'Thanisandra, Bengaluru',status:'Delayed',pct:44,units:300,launch:'2020',completion:'Jun 2025 (was Dec 2023)',type:'Residential',rera_id:'PRM/KA/RERA/1251/0922'},
+    {name:'Skylark Aria',loc:'Hebbal, Bengaluru',status:'On track',pct:38,units:240,launch:'2022',completion:'Dec 2025',type:'Premium',rera_id:'PRM/KA/RERA/1251/1302'},
+  ]},
+
+  {id:125,name:'Kolte Patil (Bengaluru)',city:'Bengaluru',state:'Karnataka',score:78,del:74,cases:13,comp:46,res:85,proj:12,banks:9,yr:2009,sent:3.8,rera:'Registered',mca:'Active',cin:'U45200KA2009PTC049218',flags:[],
+  courts:[],
+  projects:[
+    {name:'Kolte Patil Floriana',loc:'Whitefield, Bengaluru',status:'On track',pct:55,units:340,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1128'},
+    {name:'Kolte Patil Jai Vijay',loc:'Mahadevapura, Bengaluru',status:'On track',pct:38,units:280,launch:'2023',completion:'Dec 2025',type:'Residential',rera_id:'PRM/KA/RERA/1251/1388'},
+  ]},
+
+  // ── CHENNAI EXPANDED ──────────────────────────────────────────────────────
+  {id:126,name:'VGN Developers',city:'Chennai',state:'Tamil Nadu',score:74,del:69,cases:18,comp:65,res:80,proj:14,banks:7,yr:1992,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200TN1992PLC023219',flags:['delay-risk'],
+  courts:[],
+  projects:[
+    {name:'VGN Minerva',loc:'Ambattur, Chennai',status:'On track',pct:62,units:320,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'TN/01/2021/0081'},
+    {name:'VGN Fairmont',loc:'Perumbakkam, Chennai',status:'Delayed',pct:44,units:480,launch:'2019',completion:'Sep 2025 (was Dec 2023)',type:'Residential',rera_id:'TN/01/2019/0062'},
+  ]},
+
+  {id:127,name:'Arihant Foundations',city:'Chennai',state:'Tamil Nadu',score:72,del:67,cases:20,comp:73,res:78,proj:16,banks:7,yr:1991,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200TN1991PLC021219',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'TN RERA — ARH-2024-009',det:'Delay — Arihant Arden, Chennai',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Arihant Arden',loc:'Perumbakkam, Chennai',status:'Delayed',pct:44,units:540,launch:'2019',completion:'Sep 2025 (was Dec 2022)',type:'Residential',rera_id:'TN/01/2019/0058'},
+    {name:'Arihant Superstructures',loc:'Chennai, Tamil Nadu',status:'On track',pct:55,units:320,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'TN/01/2022/0078'},
+  ]},
+
+  // ── HYDERABAD EXPANDED ────────────────────────────────────────────────────
+  {id:128,name:'Cybercity Builders',city:'Hyderabad',state:'Telangana',score:71,del:66,cases:20,comp:73,res:77,proj:12,banks:7,yr:2002,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200TG2002PTC031219',flags:['delay-risk'],
+  courts:[],
+  projects:[
+    {name:'Cybercity Marina Skies',loc:'Financial District, Hyderabad',status:'On track',pct:44,units:480,launch:'2022',completion:'Dec 2025',type:'Premium',rera_id:'TS-RERA-P-0051-2022'},
+    {name:'Cybercity Aspire',loc:'Tellapur, Hyderabad',status:'Delayed',pct:38,units:360,launch:'2019',completion:'Jun 2025 (was Dec 2022)',type:'Residential',rera_id:'TS-RERA-P-0032-2019'},
+  ]},
+
+  {id:129,name:'N Homes',city:'Hyderabad',state:'Telangana',score:68,del:63,cases:23,comp:84,res:74,proj:10,banks:6,yr:2005,sent:3.2,rera:'Registered',mca:'Active',cin:'U45200TG2005PTC044219',flags:['delay-risk'],
+  courts:[],
+  projects:[
+    {name:'N Homes Sai Residency',loc:'Kompally, Hyderabad',status:'On track',pct:55,units:240,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'TS-RERA-P-0047-2022'},
+    {name:'N Homes Aashirwad',loc:'Miyapur, Hyderabad',status:'Delayed',pct:44,units:180,launch:'2020',completion:'Dec 2025 (was Mar 2023)',type:'Residential',rera_id:'TS-RERA-P-0034-2020'},
+  ]},
+
+  // ── KOLKATA EXPANDED ──────────────────────────────────────────────────────
+  {id:130,name:'Hiland Group',city:'Kolkata',state:'West Bengal',score:74,del:69,cases:17,comp:61,res:80,proj:13,banks:7,yr:1999,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200WB1999PTC052219',flags:[],
+  courts:[],
+  projects:[
+    {name:'Hiland Greens',loc:'New Town, Kolkata',status:'On track',pct:62,units:320,launch:'2021',completion:'Mar 2025',type:'Residential',rera_id:'HIRA/P/NOR/2021/001988'},
+    {name:'Hiland Park',loc:'Kolkata, West Bengal',status:'Completed',pct:100,units:240,launch:'2018',completion:'Jun 2023',type:'Residential',rera_id:'HIRA/P/NOR/2018/001291'},
+  ]},
+
+  {id:131,name:'Emami Realty',city:'Kolkata',state:'West Bengal',score:70,del:65,cases:21,comp:76,res:76,proj:10,banks:7,yr:2008,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200WB2008PLC122219',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'WB RERA — EMM-2024-009',det:'Delay — Emami City, Kolkata',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Emami City',loc:'Jessore Road, Kolkata',status:'Delayed',pct:44,units:1800,launch:'2018',completion:'Dec 2025 (was Jun 2023)',type:'Township',rera_id:'HIRA/P/NOR/2018/001418'},
+    {name:'Emami Aastha',loc:'Konnagar, Kolkata',status:'On track',pct:55,units:420,launch:'2022',completion:'Jun 2025',type:'Affordable',rera_id:'HIRA/P/NOR/2022/002512'},
+  ]},
+
+  // ── AHMEDABAD EXPANDED ────────────────────────────────────────────────────
+  {id:132,name:'Shivalik Group',city:'Ahmedabad',state:'Gujarat',score:72,del:67,cases:19,comp:69,res:79,proj:14,banks:7,yr:1993,sent:3.5,rera:'Registered',mca:'Active',cin:'U45200GJ1993PTC019821',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'Gujarat RERA — SHV-2024-011',det:'Delay — Shivalik Sharda, Ahmedabad',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Shivalik Sharda',loc:'Motera, Ahmedabad',status:'Delayed',pct:44,units:360,launch:'2020',completion:'Sep 2025 (was Dec 2023)',type:'Residential',rera_id:'GJ-RERA-H-P-PV-AH-168-2020'},
+    {name:'Shivalik Signature',loc:'Bopal, Ahmedabad',status:'On track',pct:55,units:280,launch:'2022',completion:'Dec 2025',type:'Premium',rera_id:'GJ-RERA-H-P-PV-AH-218-2022'},
+  ]},
+
+  {id:133,name:'Pacifica Companies',city:'Ahmedabad',state:'Gujarat',score:66,del:60,cases:31,comp:114,res:71,proj:12,banks:6,yr:1999,sent:3.1,rera:'Complaints Pending',mca:'Active',cin:'U45200GJ1999PTC035218',flags:['delay-risk','court-active'],
+  courts:[{type:'HC',tc:'ct-hc',case:'Gujarat HC — SCR-2024-041',det:'Delayed possession — Pacifica Sunrise, Ahmedabad',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Pacifica Sunrise',loc:'Gota, Ahmedabad',status:'Delayed',pct:44,units:640,launch:'2016',completion:'TBD (was 2022)',type:'Residential',rera_id:'GJ-RERA-H-P-PV-AH-108-2018'},
+    {name:'Pacifica Crest',loc:'Ahmedabad, Gujarat',status:'On track',pct:38,units:320,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'GJ-RERA-H-P-PV-AH-212-2022'},
+  ]},
+
+  // ── LUCKNOW EXPANDED ──────────────────────────────────────────────────────
+  {id:134,name:'Omaxe (Lucknow)',city:'Lucknow',state:'Uttar Pradesh',score:39,del:33,cases:81,comp:312,res:40,proj:9,banks:3,yr:2007,sent:1.9,rera:'Complaints Pending',mca:'Active',cin:'U45200UP2007PLC034219',flags:['delay-risk','court-active','rera-penalised'],
+  courts:[{type:'HC',tc:'ct-hc',case:'Allahabad HC — WP 11221/2024',det:'Delayed possession — Omaxe Waterfront, Lucknow',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Omaxe Waterfront',loc:'Gomti Nagar, Lucknow',status:'Stalled',pct:44,units:880,launch:'2013',completion:'TBD (was 2020)',type:'Residential',rera_id:'UPRERAPRJ019218'},
+    {name:'Omaxe City Lucknow',loc:'Amar Shaheed Path, Lucknow',status:'Delayed',pct:38,units:1200,launch:'2015',completion:'TBD',type:'Township',rera_id:'UPRERAPRJ029218'},
+  ]},
+
+  {id:135,name:'Shalimar Corp (Lucknow)',city:'Lucknow',state:'Uttar Pradesh',score:52,del:46,cases:48,comp:181,res:53,proj:8,banks:4,yr:2002,sent:2.5,rera:'Complaints Pending',mca:'Active',cin:'U45200UP2002PLC028219',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'UP RERA — SHC-2024-018',det:'Delay penalty — Shalimar Garden, Lucknow',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Shalimar Garden',loc:'Lucknow, Uttar Pradesh',status:'Delayed',pct:44,units:640,launch:'2016',completion:'TBD (was 2022)',type:'Residential',rera_id:'UPRERAPRJ041218'},
+    {name:'Shalimar Mannat',loc:'Lucknow, Uttar Pradesh',status:'On track',pct:44,units:360,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'UPRERAPRJ098222'},
+  ]},
+
+  // ── CHANDIGARH / PUNJAB EXPANDED ──────────────────────────────────────────
+  {id:136,name:'DLF (Chandigarh)',city:'Chandigarh',state:'Punjab',score:70,del:65,cases:22,comp:80,res:78,proj:8,banks:8,yr:2010,sent:3.4,rera:'Registered',mca:'Active',cin:'U45200PB2010PLC038219',flags:[],
+  courts:[],
+  projects:[
+    {name:'DLF Hyde Park',loc:'Mullanpur, Punjab',status:'On track',pct:62,units:480,launch:'2021',completion:'Mar 2025',type:'Luxury',rera_id:'PBRERA-SAS80-PRJ-2021-0598'},
+    {name:'DLF Valley Panchkula',loc:'Panchkula, Haryana',status:'Completed',pct:100,units:320,launch:'2017',completion:'Sep 2023',type:'Residential',rera_id:'HRERA-PKL-188-2017'},
+  ]},
+
+  {id:137,name:'Janta Land Promoters',city:'Chandigarh',state:'Punjab',score:55,del:49,cases:42,comp:161,res:57,proj:8,banks:4,yr:2003,sent:2.6,rera:'Complaints Pending',mca:'Active',cin:'U45200PB2003PTC027219',flags:['delay-risk','court-active'],
+  courts:[{type:'HC',tc:'ct-hc',case:'Punjab & Haryana HC — CWP 9812/2024',det:'Stalled project — JLPL Falcon View, Mohali',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'JLPL Falcon View',loc:'Sector 66-A, Mohali',status:'Stalled',pct:38,units:800,launch:'2013',completion:'TBD (was 2020)',type:'Residential',rera_id:'PBRERA-SAS80-PRJ-2018-0398'},
+    {name:'JLPL Sky Garden',loc:'Sector 66-B, Mohali',status:'Delayed',pct:44,units:540,launch:'2016',completion:'TBD (was 2022)',type:'Residential',rera_id:'PBRERA-SAS80-PRJ-2019-0421'},
+  ]},
+
+  // ── KERALA EXPANDED ───────────────────────────────────────────────────────
+  {id:138,name:'SOBHA (Kerala)',city:'Kochi',state:'Kerala',score:83,del:80,cases:5,comp:18,res:93,proj:9,banks:10,yr:2007,sent:4.1,rera:'Registered',mca:'Active',cin:'U45200KL2007PLC019219',flags:[],
+  courts:[],
+  projects:[
+    {name:'Sobha Tropical Greens',loc:'Thrissur, Kerala',status:'On track',pct:71,units:420,launch:'2021',completion:'Dec 2024',type:'Residential',rera_id:'K-RERA-N-T-81/2020'},
+    {name:'Sobha City Thrissur',loc:'Thrissur, Kerala',status:'On track',pct:38,units:560,launch:'2023',completion:'Jun 2026',type:'Township',rera_id:'K-RERA-N-T-112/2023'},
+  ]},
+
+  {id:139,name:'Asset Homes',city:'Kochi',state:'Kerala',score:74,del:69,cases:17,comp:61,res:80,proj:16,banks:7,yr:2001,sent:3.6,rera:'Registered',mca:'Active',cin:'U45200KL2001PTC013824',flags:['delay-risk'],
+  courts:[{type:'RERA',tc:'ct-rera',case:'Kerala RERA — AST-2024-007',det:'Extension — Asset Flora, Kochi',st:'Pending',sc:'cs-pending'}],
+  projects:[
+    {name:'Asset Flora',loc:'Kakkanad, Kochi',status:'Delayed',pct:51,units:220,launch:'2020',completion:'Jun 2025 (was Dec 2023)',type:'Residential',rera_id:'K-RERA-N-KO-68/2020'},
+    {name:'Asset Noushad',loc:'Edapally, Kochi',status:'On track',pct:44,units:160,launch:'2022',completion:'Dec 2025',type:'Residential',rera_id:'K-RERA-N-KO-88/2022'},
+  ]},
+
+  // ── ODISHA EXPANDED ───────────────────────────────────────────────────────
+  {id:140,name:'Sigma Infra',city:'Bhubaneswar',state:'Odisha',score:66,del:61,cases:22,comp:80,res:72,proj:8,banks:6,yr:2006,sent:3.2,rera:'Registered',mca:'Active',cin:'U45200OR2006PTC009219',flags:['delay-risk'],
+  courts:[],
+  projects:[
+    {name:'Sigma Residency',loc:'Patia, Bhubaneswar',status:'On track',pct:55,units:180,launch:'2022',completion:'Jun 2025',type:'Residential',rera_id:'OD-RERA-P-0044-2022'},
+    {name:'Sigma Green Valley',loc:'Bhubaneswar, Odisha',status:'Delayed',pct:38,units:240,launch:'2020',completion:'Dec 2025 (was Mar 2023)',type:'Residential',rera_id:'OD-RERA-P-0038-2020'},
+  ]},
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCREENER ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+document.getElementById('total-count').textContent = DB.length;
+const PAGE = 20;
+let page = 1, filtered = [], openCards = new Set();
+window._R = [];
+
+function sc(s){return s>=75?'sh':s>=50?'sm':'sl'}
+function bc(p){return p>=70?'var(--green)':p>=45?'var(--amber)':'var(--red)'}
+function ps(s){return s==='Completed'?'tg':s==='On track'?'tb':s==='Delayed'?'ta':'tr'}
+function uR(id,vid){document.getElementById(vid).textContent=document.getElementById(id).value}
+function uRp(id,vid){document.getElementById(vid).textContent=document.getElementById(id).value+'%'}
+function uRc(){const v=+document.getElementById('f-cases').value;document.getElementById('cases-v').textContent=v>=350?'Any':v}
+
+function gF(){
+  return {
+    search:document.getElementById('f-search').value.toLowerCase().trim(),
+    state:document.getElementById('f-state').value,
+    city:document.getElementById('f-city').value,
+    minScore:+document.getElementById('f-score').value,
+    minDel:+document.getElementById('f-del').value,
+    maxCases:+document.getElementById('f-cases').value,
+    rera:document.getElementById('f-rera').value,
+    nc:document.getElementById('f-nc').checked,
+    nd:document.getElementById('f-nd').checked,
+    nn:document.getElementById('f-nn').checked,
+    ns:document.getElementById('f-ns').checked,
+    np:document.getElementById('f-np').checked,
+    minBanks:+document.getElementById('f-banks').value,
+    minProj:+document.getElementById('f-proj').value,
+    sort:document.getElementById('sort-by').value,
+  };
+}
+
+function fSort(f){
+  let d=DB.filter(b=>{
+    const s=f.search;
+    if(s&&!b.name.toLowerCase().includes(s)&&!b.city.toLowerCase().includes(s)&&!b.projects.some(p=>p.name.toLowerCase().includes(s)))return false;
+    if(f.state&&b.state!==f.state)return false;
+    if(f.city&&b.city!==f.city)return false;
+    if(b.score<f.minScore)return false;
+    if(b.del<f.minDel)return false;
+    if(f.maxCases<350&&b.cases>f.maxCases)return false;
+    if(f.rera&&b.rera!==f.rera)return false;
+    if(f.nc&&b.flags.includes('court-active'))return false;
+    if(f.nd&&b.flags.includes('delay-risk'))return false;
+    if(f.nn&&b.flags.includes('insolvency'))return false;
+    if(f.ns&&b.flags.includes('scam-risk'))return false;
+    if(f.np&&b.flags.includes('rera-penalised'))return false;
+    if(b.banks<f.minBanks)return false;
+    if(b.proj<f.minProj)return false;
+    return true;
+  });
+  const[sk,sd]=f.sort.split('-');
+  const km={score:'score',cases:'cases',delivery:'del',projects:'proj',name:'name'};
+  const k=km[sk]||'score';
+  d.sort((a,b)=>{let av=a[k],bv=b[k];if(typeof av==='string'){av=av.toLowerCase();bv=bv.toLowerCase();}return sd==='asc'?(av>bv?1:-1):(av<bv?1:-1);});
+  return d;
+}
+
+function chips(f){
+  const c=[];
+  if(f.search)c.push({l:`"${f.search}"`,r:()=>{document.getElementById('f-search').value='';applyFilters();}});
+  if(f.state)c.push({l:f.state,r:()=>{document.getElementById('f-state').value='';applyFilters();}});
+  if(f.city)c.push({l:f.city,r:()=>{document.getElementById('f-city').value='';applyFilters();}});
+  if(f.minScore>0)c.push({l:`Score ≥ ${f.minScore}`,r:()=>{document.getElementById('f-score').value=0;uR('f-score','score-v');applyFilters();}});
+  if(f.minDel>0)c.push({l:`On-time ≥ ${f.minDel}%`,r:()=>{document.getElementById('f-del').value=0;uRp('f-del','del-v');applyFilters();}});
+  if(f.maxCases<350)c.push({l:`Cases ≤ ${f.maxCases}`,r:()=>{document.getElementById('f-cases').value=350;uRc();applyFilters();}});
+  if(f.rera)c.push({l:`RERA: ${f.rera}`,r:()=>{document.getElementById('f-rera').value='';applyFilters();}});
+  if(f.nc)c.push({l:'No court',r:()=>{document.getElementById('f-nc').checked=false;applyFilters();}});
+  if(f.nd)c.push({l:'No delay',r:()=>{document.getElementById('f-nd').checked=false;applyFilters();}});
+  if(f.nn)c.push({l:'No NCLT',r:()=>{document.getElementById('f-nn').checked=false;applyFilters();}});
+  if(f.ns)c.push({l:'No scam',r:()=>{document.getElementById('f-ns').checked=false;applyFilters();}});
+  if(f.np)c.push({l:'No penalty',r:()=>{document.getElementById('f-np').checked=false;applyFilters();}});
+  if(f.minBanks>0)c.push({l:`Banks ≥ ${f.minBanks}`,r:()=>{document.getElementById('f-banks').value=0;uR('f-banks','banks-v');applyFilters();}});
+  if(f.minProj>0)c.push({l:`Projects ≥ ${f.minProj}`,r:()=>{document.getElementById('f-proj').value=0;uR('f-proj','proj-v');applyFilters();}});
+  window._R=c.map(x=>x.r);
+  document.getElementById('af').innerHTML=c.map((x,i)=>`<div class="afc">${x.l}<button onclick="window._R[${i}]()">×</button></div>`).join('');
+}
+
+function flagLabel(f){
+  return {'court-active':{l:'Court Active',c:'tr'},'delay-risk':{l:'Delay Risk',c:'ta'},'scam-risk':{l:'Scam Risk',c:'tr'},'insolvency':{l:'NCLT',c:'tr'},'rera-penalised':{l:'RERA Penalised',c:'tr'}}[f];
+}
+
+function render(data){
+  const start=(page-1)*PAGE, pg=data.slice(start,start+PAGE);
+  if(!data.length){document.getElementById('bl').innerHTML='<div class="no-res"><div class="no-res-i">∅</div><div>No builders match your filters.</div></div>';document.getElementById('pg').innerHTML='';return;}
+
+  document.getElementById('bl').innerHTML=pg.map(b=>{
+    const isOpen=openCards.has(b.id);
+    const flags=b.flags.length?b.flags.map(f=>{const d=flagLabel(f);return d?`<span class="tag ${d.c}">${d.l}</span>`:''}).join(''):`<span class="tag tg">No flags</span>`;
+
+    // Build projects table
+    const projRows=b.projects.map(p=>{
+      const pCol=p.status==='Completed'?'var(--green)':p.status==='On track'?'var(--blue)':p.status==='Delayed'?'var(--amber)':'var(--red)';
+      return `<tr>
+        <td><div class="proj-name">${p.name}</div><div class="proj-loc">${p.loc}</div>
+          <div class="proj-bar"><div class="proj-bar-fill" style="width:${p.pct}%;background:${pCol}"></div></div>
+        </td>
+        <td><span class="tag ${ps(p.status)}">${p.status}</span></td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2)">${p.pct}%</span></td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2)">${p.units.toLocaleString()}</span></td>
+        <td><span style="font-size:11px;color:var(--ink3)">${p.completion}</span></td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--blue)">${p.rera_id}</span></td>
+        <td><span style="font-size:11px;color:var(--ink3)">${p.type}</span></td>
+      </tr>`;
+    }).join('');
+
+    const courts=b.courts.length?b.courts.map(c=>`<div class="cr"><span class="ct ${c.tc}">${c.type}</span><div class="ci2"><div class="ct2">${c.case}</div><div class="cs2">${c.det}</div></div><span class="cst ${c.sc}">${c.st}</span></div>`).join(''):`<div style="font-size:12px;color:var(--ink3);padding:6px 0">No court records on file</div>`;
+
+    return `<div class="bc" id="card-${b.id}">
+      <div class="cs" onclick="toggle(${b.id})">
+        <div>
+          <div class="bn">${b.name}</div>
+          <div class="bm">${b.city} · ${b.state} · Est. ${b.yr} · CIN: ${b.cin}</div>
+        </div>
+        <div class="ms"><div><span class="sp ${sc(b.score)}">${b.score}</span></div><div class="ml">score</div></div>
+        <div class="ms"><div class="mv">${b.del}%</div><div class="ml">on-time</div></div>
+        <div class="ms"><div class="mv" style="color:${b.cases>50?'var(--red)':b.cases>10?'var(--amber)':'var(--green)'}">${b.cases}</div><div class="ml">cases</div></div>
+        <div class="ms"><div class="mv">${b.proj}</div><div class="ml">projects</div></div>
+        <div class="ms"><div class="mv">${b.banks}</div><div class="ml">banks</div></div>
+        <button class="eb ${isOpen?'open':''}">${isOpen?'−':'+'}</button>
+      </div>
+
+      <div class="cd ${isOpen?'open':''}">
+        <div class="tab-row">
+          <button class="tab-btn active" onclick="switchTab(${b.id},0,this)">Overview</button>
+          <button class="tab-btn" onclick="switchTab(${b.id},1,this)">Ongoing Projects (${b.projects.length})</button>
+          <button class="tab-btn" onclick="switchTab(${b.id},2,this)">Court Records (${b.courts.length})</button>
+        </div>
+
+        <!-- TAB 0: OVERVIEW -->
+        <div class="tab-panel active" id="tab-${b.id}-0">
+          <div class="dg">
+            <div class="db">
+              <div class="dbl">RERA profile</div>
+              <div class="dr"><span class="dk">Status</span><span class="dv">${b.rera}</span></div>
+              <div class="dr"><span class="dk">Complaints filed</span><span class="dv">${b.comp}</span></div>
+              <div class="dr"><span class="dk">Complaints resolved</span>
+                <div class="pb" style="width:120px"><div class="pbb"><div class="pbf" style="width:${b.res}%;background:${bc(b.res)}"></div></div><span class="pbv">${b.res}%</span></div>
+              </div>
+              <div class="dr"><span class="dk">Bank approvals</span><span class="dv">${b.banks} lenders</span></div>
+            </div>
+            <div class="db">
+              <div class="dbl">Corporate health</div>
+              <div class="dr"><span class="dk">MCA status</span><span class="dv">${b.mca}</span></div>
+              <div class="dr"><span class="dk">CIN number</span><span class="dv" style="font-size:10px">${b.cin}</span></div>
+              <div class="dr"><span class="dk">Total projects</span><span class="dv">${b.proj}</span></div>
+              <div class="dr"><span class="dk">Buyer sentiment</span><span class="dv">${b.sent}/5.0</span></div>
+            </div>
+            <div class="db">
+              <div class="dbl">Risk flags</div>
+              <div style="padding:6px 0">${flags}</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--ink3);font-family:'DM Mono',monospace;padding:6px 0">
+            Sources: RERA portals · eCourts API · MCA21 · NCDRC · Supreme Court · Consumer forums
+          </div>
+        </div>
+
+        <!-- TAB 1: PROJECTS -->
+        <div class="tab-panel" id="tab-${b.id}-1">
+          <div style="overflow-x:auto">
+            <table class="proj-table">
+              <thead><tr>
+                <th>Project name &amp; location</th>
+                <th>Status</th>
+                <th>Built</th>
+                <th>Units</th>
+                <th>Completion</th>
+                <th>RERA ID</th>
+                <th>Type</th>
+              </tr></thead>
+              <tbody>${projRows}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: COURT -->
+        <div class="tab-panel" id="tab-${b.id}-2">
+          ${courts}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Pagination
+  const pages=Math.ceil(data.length/PAGE);
+  if(pages<=1){document.getElementById('pg').innerHTML='';return;}
+  let h=`<button class="pb2" onclick="gP(${page-1})" ${page===1?'disabled':''}>← Prev</button>`;
+  for(let i=1;i<=pages;i++){
+    if(i===1||i===pages||Math.abs(i-page)<=1)h+=`<button class="pb2 ${i===page?'active':''}" onclick="gP(${i})">${i}</button>`;
+    else if(Math.abs(i-page)===2)h+=`<span class="pi">…</span>`;
+  }
+  h+=`<button class="pb2" onclick="gP(${page+1})" ${page===pages?'disabled':''}>Next →</button>`;
+  h+=`<span class="pi">Showing ${Math.min(start+1,data.length)}–${Math.min(start+PAGE,data.length)} of ${data.length}</span>`;
+  document.getElementById('pg').innerHTML=h;
+}
+
+function gP(p){const pages=Math.ceil(filtered.length/PAGE);if(p<1||p>pages)return;page=p;render(filtered);window.scrollTo({top:0,behavior:'smooth'});}
+
+function toggle(id){
+  if(openCards.has(id))openCards.delete(id);else openCards.add(id);
+  render(filtered);
+}
+
+function switchTab(bid,idx,btn){
+  // Deactivate all tabs for this card
+  document.querySelectorAll(`#card-${bid} .tab-btn`).forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll(`#card-${bid} .tab-panel`).forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`tab-${bid}-${idx}`).classList.add('active');
+}
+
+function applyFilters(){
+  const f=gF();
+  filtered=fSort(f);
+  page=1;
+  document.getElementById('rc').textContent=filtered.length;
+  chips(f);
+  render(filtered);
+}
+
+function resetAll(){
+  document.getElementById('f-search').value='';
+  ['f-state','f-city','f-rera'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-score').value=0;document.getElementById('score-v').textContent='0';
+  document.getElementById('f-del').value=0;document.getElementById('del-v').textContent='0%';
+  document.getElementById('f-cases').value=350;document.getElementById('cases-v').textContent='Any';
+  document.getElementById('f-banks').value=0;document.getElementById('banks-v').textContent='0';
+  document.getElementById('f-proj').value=0;document.getElementById('proj-v').textContent='0';
+  ['f-nc','f-nd','f-nn','f-ns','f-np'].forEach(id=>document.getElementById(id).checked=false);
+  openCards.clear();
+  applyFilters();
+}
+
+function doRefresh(){
+  const btn=document.getElementById('rfbtn');
+  btn.classList.add('spinning');
+  document.getElementById('stext').textContent='Refreshing…';
+  setTimeout(()=>{
+    btn.classList.remove('spinning');
+    document.getElementById('stext').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('sdot').className='sdot live';
+    const t=document.getElementById('toast');
+    t.textContent='Data refreshed — '+DB.length+' builders · '+new Date().toLocaleString('en-IN');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),3000);
+  },1200);
+}
+
+applyFilters();
+document.getElementById('stext').textContent='Ready — '+DB.length+' builders loaded';
+</script>
+</body>
+</html>
